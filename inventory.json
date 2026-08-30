@@ -12,7 +12,15 @@
     "reason": "实验室测试",
     "seller": "三星中国研究院",
     "remark": "",
-    "outHistory": [],
+    "outHistory": [
+      {
+        "date": "2026-08-30",
+        "receiver": "李三",
+        "reason": "晚",
+        "quantity": 1,
+        "remark": ""
+      }
+    ],
     "createdAt": "2026-08-30T10:54:19.876Z"
   }
 ]
