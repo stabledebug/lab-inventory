@@ -232,7 +232,7 @@
         <div class="stat-card"><div class="stat-num" id="s-monthIn">0</div><div class="stat-label" id="s-month-title">本月入库</div></div>
       </div>
       <div class="section">
-        <div class="section-title">库存金额</div>
+        <div class="section-title">💰 库存价值（按剩余数量折算）</div>
         <div style="padding:16px">
           <div class="info-row"><span class="label">库存金额(¥)</span><span class="value price" id="s-stockCny">¥0.00</span></div>
           <div class="info-row"><span class="label">库存金额($)</span><span class="value price" id="s-stockUsd">$0.00</span></div>
@@ -442,7 +442,8 @@ function openDetail(id) {
       <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="section-title">入库信息 <span style="float:right;font-size:14px;color:${isOut?'#ff4d4f':'#52c41a'}">库存 ${isOut ? 0 : stock} / ${r.quantity} ${esc(r.unit||'件')}</span></div>
         <div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec) || '-'}</span></div>
-        <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
+        <div class="info-row"><span class="label">入库金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
+        <div class="info-row"><span class="label">当前库存价值</span><span class="value price" style="color:${isOut?'#ff4d4f':'#52c41a'}">${isOut ? '-' : fmtPrice(parseFloat(r.amount) * stock / parseFloat(r.quantity), r.currency)}</span></div>
         <div class="info-row"><span class="label">入库日期</span><span class="value">${esc(r.inDate)}</span></div>
         <div class="info-row"><span class="label">采购人</span><span class="value">${esc(r.purchaser) || '-'}</span></div>
         <div class="info-row"><span class="label">采购理由</span><span class="value">${esc(r.reason) || '-'}</span></div>
