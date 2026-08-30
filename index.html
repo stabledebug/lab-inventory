@@ -224,8 +224,9 @@
     <div id="view-stats" class="view">
       <div class="stat-cards">
         <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">总记录</div></div>
-        <div class="stat-card green"><div class="stat-num" id="s-in">0</div><div class="stat-label">库存中</div></div>
-        <div class="stat-card orange"><div class="stat-num" id="s-out">0</div><div class="stat-label">已出库</div></div>
+        <div class="stat-card green"><div class="stat-num" id="s-in">0</div><div class="stat-label">库存品数</div></div>
+        <div class="stat-card orange"><div class="stat-num" id="s-out">0</div><div class="stat-label">已用完</div></div>
+        <div class="stat-card blue"><div class="stat-num" id="s-stockQty">0</div><div class="stat-label">库存总数量</div></div>
         <div class="stat-card"><div class="stat-num" id="s-monthIn">0</div><div class="stat-label" id="s-month-title">本月入库</div></div>
       </div>
       <div class="section">
@@ -321,13 +322,23 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
 
 document.getElementById('searchInput').addEventListener('input', renderRecords);
 
+// 计算总出库数量（兼容新旧格式）
+function calcTotalOut(r) {
+  const hist = r.outHistory || [];
+  let total = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+  // 兼容旧格式的 outQuantity
+  if (r.outQuantity && !r.outDate) {
+    total += parseFloat(r.outQuantity) || 0;
+  }
+  return total;
+}
+
 function getFilteredList() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   return DB.filter(r => {
     const matchSearch = !q || [r.name, r.purchaser, r.seller].some(s => (s||'').toLowerCase().includes(q));
-    const hist = r.outHistory || [];
-    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
-    const stock = parseFloat(r.quantity) - totalOut;
+    const totalOut = calcTotalOut(r);
+    const stock = parseFloat(r.quantity || 0) - totalOut;
     const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && stock > 0) || (currentFilter === 'out' && stock <= 0);
     return matchSearch && matchFilter;
   });
@@ -341,9 +352,8 @@ function renderRecords() {
     return;
   }
   el.innerHTML = list.map(r => {
-    const hist = r.outHistory || [];
-    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
-    const stock = parseFloat(r.quantity) - totalOut;
+    const totalOut = calcTotalOut(r);
+    const stock = parseFloat(r.quantity || 0) - totalOut;
     const isOut = stock <= 0;
     return `
     <div class="record-card" onclick="openDetail('${r.id}')">
@@ -363,8 +373,8 @@ function openDetail(id) {
   const r = DB.find(x => x.id === id);
   if (!r) return;
   const hist = r.outHistory || [];
-  const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
-  const stock = parseFloat(r.quantity) - totalOut;
+  const totalOut = calcTotalOut(r);
+  const stock = parseFloat(r.quantity || 0) - totalOut;
   const isOut = stock <= 0;
   const maxOut = Math.min(stock, 999999);
   const sheet = document.getElementById('sheet');
@@ -588,8 +598,7 @@ function renderStats() {
   list.forEach(r => {
     const qty = parseFloat(r.quantity) || 0;
     const price = parseFloat(r.amount) || 0;
-    const hist = r.outHistory || [];
-    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const totalOut = calcTotalOut(r);
     const stock = qty - totalOut;
     if (stock > 0) inStock++;
     // 按比例计算库存价值
@@ -607,6 +616,7 @@ function renderStats() {
   document.getElementById('s-total').textContent = total;
   document.getElementById('s-in').textContent = inStock;
   document.getElementById('s-out').textContent = outStock;
+  document.getElementById('s-stockQty').textContent = stockQty;
   document.getElementById('s-stockCny').textContent = '¥' + stockCny.toFixed(2);
   document.getElementById('s-stockUsd').textContent = '$' + stockUsd.toFixed(2);
   document.getElementById('s-inCny').textContent = '¥' + inCny.toFixed(2);
@@ -854,8 +864,7 @@ function renderOutList() {
   const el = document.getElementById('outList');
   // 只显示有库存的物品
   const inStock = DB.filter(r => {
-    const hist = r.outHistory || [];
-    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const totalOut = calcTotalOut(r);
     return (parseFloat(r.quantity) || 0) - totalOut > 0;
   }).filter(r => !q || r.name.toLowerCase().includes(q) || (r.spec||'').toLowerCase().includes(q));
   if (!inStock.length) {
@@ -863,8 +872,7 @@ function renderOutList() {
     return;
   }
   el.innerHTML = inStock.map(r => {
-    const hist = r.outHistory || [];
-    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const totalOut = calcTotalOut(r);
     const stock = (parseFloat(r.quantity) || 0) - totalOut;
     return `
     <div class="record-card" onclick="openOutForm('${r.id}')">
@@ -882,9 +890,9 @@ function renderOutList() {
 function openOutForm(id) {
   const r = DB.find(x => x.id === id);
   if (!r) return;
-  const hist = r.outHistory || [];
-  const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+  const totalOut = calcTotalOut(r);
   const stock = (parseFloat(r.quantity) || 0) - totalOut;
+  const hist = r.outHistory || [];
   const sheet = document.getElementById('sheet');
   sheet.innerHTML = `
     <div class="sheet-head"><span class="sheet-title">出库：${esc(r.name)}</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
@@ -923,10 +931,10 @@ async function confirmQuickOut(id) {
   await ensureFresh();
   const r = DB.find(x => x.id === id);
   if (!r) return;
-  const hist = r.outHistory || [];
-  const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+  const totalOut = calcTotalOut(r);
   const stock = (parseFloat(r.quantity) || 0) - totalOut;
   if (outQuantity > stock) { toast('出库数量不能超过库存 ' + stock); return; }
+  const hist = r.outHistory || [];
   hist.push({ date: outDate, receiver: outReceiver, reason: outReason, quantity: outQuantity, remark: document.getElementById('o-remark').value.trim() });
   r.outHistory = hist;
   try {
