@@ -12,7 +12,15 @@
     "reason": "实验室耗材",
     "seller": "国家珠宝",
     "remark": "",
-    "outHistory": [],
+    "outHistory": [
+      {
+        "date": "2026-08-30",
+        "receiver": "一个人",
+        "reason": "测试",
+        "quantity": 50,
+        "remark": ""
+      }
+    ],
     "createdAt": "2026-08-30T12:40:09.879Z"
   },
   {
