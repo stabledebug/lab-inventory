@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "1788085487620",
+    "name": "黄金",
+    "spec": "2克",
+    "quantity": "10",
+    "unit": "件",
+    "amount": "2000",
+    "currency": "CNY",
+    "inDate": "2026-08-30",
+    "purchaser": "张三",
+    "reason": "材料费",
+    "seller": "中国黄金",
+    "remark": "",
+    "outDate": "",
+    "outReceiver": "",
+    "outReason": "",
+    "outQuantity": "",
+    "outPrice": "",
+    "outCurrency": "CNY",
+    "outRemark": "",
+    "createdAt": "2026-08-30T10:24:47.620Z"
+  }
+]
