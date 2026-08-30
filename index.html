@@ -729,13 +729,9 @@ document.getElementById('exportBtn').addEventListener('click', () => {
       // 无出库记录，只导出一行
       rows.push([...base, '', '', '', '', '']);
     } else {
-      // 每条出库记录一行
-      hist.forEach((h, i) => {
-        if (i === 0) {
-          rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
-        } else {
-          rows.push(['', '', '', '', '', '', '', '', '', '', '', '', h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
-        }
+      // 每条出库记录一行，每行都显示完整物品信息
+      hist.forEach(h => {
+        rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
       });
     }
   });
