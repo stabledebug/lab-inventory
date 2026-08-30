@@ -320,11 +320,66 @@
   .record-card.out-history {
     border-left: 3px solid var(--orange);
   }
+
+  /* 主题切换按钮 */
+  .theme-toggle {
+    position: fixed;
+    top: 14px;
+    right: 16px;
+    background: var(--card2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--text);
+    cursor: pointer;
+    z-index: 11;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .theme-toggle:hover {
+    background: var(--card);
+    border-color: var(--blue);
+  }
+  .theme-toggle .icon { font-size: 14px; }
+
+  /* 亮色主题 */
+  body.light-theme {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --card2: #f8f9fa;
+    --text: #333;
+    --muted: #888;
+    --border: #e8e8e8;
+    --blue: #1890ff;
+    --blue2: #177ddc;
+    --green: #52c41a;
+    --orange: #fa8c16;
+    --red: #ff4d4f;
+    --purple: #722ed1;
+  }
+  body.light-theme header { background: var(--blue); }
+  body.light-theme .record-name { background: none; -webkit-text-fill-color: var(--text); }
+  body.light-theme .stat-num { text-shadow: none; }
+  body.light-theme .value.price { text-shadow: none; color: var(--blue); }
+  body.light-theme .record-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.15); }
+  body.light-theme .submit-btn, body.light-theme .token-btn { box-shadow: 0 4px 15px rgba(24,144,255,0.3); }
+  body.light-theme .nav-bar { background: rgba(255,255,255,0.95); }
+  body.light-theme .btn.primary { box-shadow: 0 4px 15px rgba(24,144,255,0.3); }
+
 </style>
 </head>
 <body>
 <div id="app">
-  <header>课题组耗材管理</header>
+  <header>
+    课题组耗材管理
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">
+      <span class="icon">🌙</span>
+      <span id="themeText">切换风格</span>
+    </button>
+  </header>
   <main>
     <div id="view-records" class="view active">
       <div class="search-bar"><input class="search-input" id="searchInput" placeholder="搜索货物名称、采购人、领用人..."></div>
@@ -1005,6 +1060,34 @@ document.getElementById('importFile').addEventListener('change', async e => {
   };
   reader.readAsText(file, 'UTF-8');
 });
+
+// 主题切换
+function toggleTheme() {
+  const body = document.body;
+  const icon = document.querySelector('#themeToggle .icon');
+  const text = document.getElementById('themeText');
+  if (body.classList.contains('light-theme')) {
+    body.classList.remove('light-theme');
+    icon.textContent = '🌙';
+    text.textContent = '浅色';
+    localStorage.setItem('theme', 'dark');
+  } else {
+    body.classList.add('light-theme');
+    icon.textContent = '☀️';
+    text.textContent = '深色';
+    localStorage.setItem('theme', 'light');
+  }
+}
+
+// 初始化主题
+(function() {
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    document.body.classList.add('light-theme');
+    document.querySelector('#themeToggle .icon').textContent = '☀️';
+    document.getElementById('themeText').textContent = '深色';
+  }
+})();
 
 function parseCSV(text) {
   const rows = [];
