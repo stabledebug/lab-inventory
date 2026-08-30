@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=750, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#1890ff">
 <title>课题组耗材管理</title>
 <style>
@@ -21,18 +21,19 @@
   html, body { height: 100%; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif;
-    background: var(--bg);
+    background: #e9e9e9;
     color: var(--text);
-    font-size: 28px;
+    font-size: 14px;
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
   }
-  #app { max-width: 750px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); }
+  #app { max-width: 500px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; background: var(--bg); box-shadow: 0 0 24px rgba(0,0,0,0.06); }
 
   header {
     background: var(--blue);
     color: #fff;
-    padding: 28px 30px;
-    font-size: 34px;
+    padding: 14px 16px;
+    font-size: 18px;
     font-weight: 600;
     text-align: center;
     position: sticky;
@@ -40,124 +41,129 @@
     z-index: 10;
   }
 
-  main { flex: 1; overflow-y: auto; padding-bottom: 120px; }
+  main { flex: 1; overflow-y: auto; padding-bottom: 64px; -webkit-overflow-scrolling: touch; }
   .view { display: none; }
   .view.active { display: block; }
 
-  .section { background: var(--card); margin: 20px 30px; border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-  .section-title { font-size: 28px; font-weight: 600; color: var(--text); padding: 28px 30px 20px; border-bottom: 1px solid var(--border); }
+  .section { background: var(--card); margin: 12px 16px; border-radius: 12px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .section-title { font-size: 15px; font-weight: 600; color: var(--text); padding: 16px; border-bottom: 1px solid var(--border); }
   .section-title.red { color: var(--red); }
 
-  .search-bar { background: #fff; padding: 20px 30px; }
+  .search-bar { background: #fff; padding: 12px 16px; }
   .search-input {
-    width: 100%; background: var(--bg); border: none; border-radius: 32px;
-    padding: 0 24px; height: 72px; font-size: 28px; color: var(--text); outline: none;
+    width: 100%; background: var(--bg); border: none; border-radius: 20px;
+    padding: 0 14px; height: 40px; font-size: 14px; color: var(--text); outline: none;
   }
-  .filter-tabs { background: #fff; padding: 0 30px; display: flex; border-bottom: 1px solid var(--border); }
-  .tab { font-size: 28px; color: #666; padding: 20px 24px; position: relative; cursor: pointer; }
+  .filter-tabs { background: #fff; padding: 0 16px; display: flex; border-bottom: 1px solid var(--border); }
+  .tab { font-size: 14px; color: #666; padding: 12px; position: relative; cursor: pointer; }
   .tab.active { color: var(--blue); font-weight: 600; }
   .tab.active::after {
     content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 48px; height: 4px; background: var(--blue); border-radius: 2px;
+    width: 28px; height: 3px; background: var(--blue); border-radius: 2px;
   }
 
-  .record-list { padding: 20px 30px; }
+  .record-list { padding: 12px 16px; }
   .record-card {
-    background: var(--card); border-radius: 16px; padding: 28px; margin-bottom: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer;
+    background: var(--card); border-radius: 12px; padding: 16px; margin-bottom: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.06); cursor: pointer;
   }
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-  .record-name { font-size: 32px; font-weight: 600; flex: 1; margin-right: 16px; }
-  .badge { font-size: 22px; padding: 6px 16px; border-radius: 20px; white-space: nowrap; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .record-name { font-size: 16px; font-weight: 600; flex: 1; margin-right: 10px; word-break: break-all; }
+  .badge { font-size: 12px; padding: 3px 8px; border-radius: 12px; white-space: nowrap; }
   .badge.in { background: #e6f7ff; color: var(--blue); border: 1px solid #91d5ff; }
   .badge.out { background: var(--bg); color: var(--muted); border: 1px solid #d9d9d9; }
-  .info-row { display: flex; align-items: center; padding: 6px 0; }
-  .label { font-size: 24px; color: var(--muted); min-width: 140px; flex-shrink: 0; }
-  .value { font-size: 26px; color: var(--text); flex: 1; word-break: break-all; }
+  .info-row { display: flex; align-items: center; padding: 4px 0; }
+  .label { font-size: 12px; color: var(--muted); min-width: 80px; flex-shrink: 0; }
+  .value { font-size: 13px; color: var(--text); flex: 1; word-break: break-all; }
   .value.danger { color: var(--red); }
   .value.price { color: var(--blue); font-weight: 600; }
 
-  .empty { text-align: center; color: var(--muted); font-size: 28px; padding: 120px 40px; }
-  .empty .icon { font-size: 100px; display: block; margin-bottom: 20px; }
+  .empty { text-align: center; color: var(--muted); font-size: 14px; padding: 60px 20px; }
+  .empty .icon { font-size: 48px; display: block; margin-bottom: 12px; }
 
-  .form-section { margin: 20px 30px; background: #fff; border-radius: 16px; padding: 10px 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-  .field { padding: 24px 0; border-bottom: 1px solid var(--border); }
+  .form-section { margin: 12px 16px; background: #fff; border-radius: 12px; padding: 4px 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .field { padding: 14px 0; border-bottom: 1px solid var(--border); }
   .field:last-child { border-bottom: none; }
-  .field-label { font-size: 26px; color: var(--text); margin-bottom: 14px; font-weight: 500; }
+  .field-label { font-size: 13px; color: var(--text); margin-bottom: 8px; font-weight: 500; }
   .field-label.required::before { content: '* '; color: var(--red); }
   .field-input, .field-select, .field-textarea {
-    width: 100%; border: 1px solid #e8e8e8; border-radius: 12px; padding: 20px;
-    font-size: 28px; color: var(--text); background: #fafafa; outline: none; font-family: inherit;
+    width: 100%; border: 1px solid #e8e8e8; border-radius: 8px; padding: 12px;
+    font-size: 14px; color: var(--text); background: #fafafa; outline: none; font-family: inherit;
   }
-  .field-textarea { resize: vertical; min-height: 120px; }
-  .row2 { display: flex; gap: 20px; }
+  .field-textarea { resize: vertical; min-height: 64px; }
+  .row2 { display: flex; gap: 12px; }
   .row2 > .field { flex: 1; }
   .submit-btn {
-    margin: 30px; background: var(--blue); color: #fff; border: none; border-radius: 48px;
-    height: 92px; font-size: 32px; font-weight: 600; width: calc(100% - 60px); cursor: pointer;
+    margin: 16px; background: var(--blue); color: #fff; border: none; border-radius: 23px;
+    height: 46px; font-size: 16px; font-weight: 600; width: calc(100% - 32px); cursor: pointer;
   }
   .submit-btn:active { opacity: 0.85; }
 
-  .overview-row { display: flex; padding: 30px 30px 10px; gap: 20px; }
-  .stat-card { flex: 1; border-radius: 16px; padding: 30px 10px 24px; text-align: center; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .overview-row { display: flex; padding: 16px 16px 8px; gap: 12px; }
+  .stat-card { flex: 1; border-radius: 12px; padding: 16px 8px 14px; text-align: center; box-shadow: 0 1px 10px rgba(0,0,0,0.08); }
   .stat-card.blue { background: var(--blue); }
   .stat-card.green { background: var(--green); }
   .stat-card.orange { background: var(--orange); }
-  .stat-num { display: block; font-size: 52px; font-weight: 700; color: #fff; line-height: 1; margin-bottom: 10px; }
-  .stat-lbl { display: block; font-size: 22px; color: rgba(255,255,255,0.85); }
+  .stat-num { display: block; font-size: 26px; font-weight: 700; color: #fff; line-height: 1; margin-bottom: 6px; }
+  .stat-lbl { display: block; font-size: 11px; color: rgba(255,255,255,0.85); }
 
-  .amount-row { display: flex; align-items: center; padding: 24px 30px; }
+  .amount-row { display: flex; align-items: center; padding: 14px 16px; }
   .amount-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
-  .amount-divider { width: 1px; height: 80px; background: var(--border); }
-  .amount-lbl { font-size: 24px; color: var(--muted); margin-bottom: 12px; }
-  .amount-cny { font-size: 36px; font-weight: 700; color: var(--blue); line-height: 1.2; }
-  .amount-usd { font-size: 24px; color: var(--orange); margin-top: 4px; }
+  .amount-divider { width: 1px; height: 44px; background: var(--border); }
+  .amount-lbl { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .amount-cny { font-size: 18px; font-weight: 700; color: var(--blue); line-height: 1.2; }
+  .amount-usd { font-size: 13px; color: var(--orange); margin-top: 2px; }
 
-  .trend-chart { display: flex; align-items: flex-end; justify-content: space-around; padding: 30px 20px 10px; height: 220px; }
+  .trend-chart { display: flex; align-items: flex-end; justify-content: space-around; padding: 16px 12px 8px; height: 140px; }
   .trend-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
   .trend-bar-wrap { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
-  .trend-bar { width: 44px; background: var(--blue); border-radius: 6px 6px 0 0; min-height: 4px; transition: height .3s; }
-  .trend-count { font-size: 20px; color: var(--blue); font-weight: 600; margin-bottom: 6px; }
-  .trend-label { font-size: 20px; color: var(--muted); margin-top: 8px; }
+  .trend-bar { width: 24px; background: var(--blue); border-radius: 3px 3px 0 0; min-height: 3px; transition: height .3s; }
+  .trend-count { font-size: 11px; color: var(--blue); font-weight: 600; margin-bottom: 4px; }
+  .trend-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
 
-  .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 24px 30px; border-bottom: 1px solid #f9f9f9; }
+  .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f9f9f9; }
   .recent-item:last-child { border-bottom: none; }
-  .recent-name { font-size: 28px; color: var(--text); font-weight: 500; display: block; margin-bottom: 8px; }
-  .recent-date { font-size: 22px; color: var(--muted); }
-  .dot { width: 14px; height: 14px; border-radius: 50%; margin-left: 20px; flex-shrink: 0; }
+  .recent-name { font-size: 14px; color: var(--text); font-weight: 500; display: block; margin-bottom: 4px; word-break: break-all; }
+  .recent-date { font-size: 11px; color: var(--muted); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; margin-left: 12px; flex-shrink: 0; }
   .dot.in { background: var(--green); }
   .dot.out { background: #ddd; }
 
-  .export-tip { font-size: 24px; color: var(--muted); padding: 24px 30px 16px; line-height: 1.6; }
-  .export-btn { margin: 0 30px 30px; background: var(--blue); color: #fff; border: none; border-radius: 48px; height: 88px; font-size: 30px; font-weight: 600; width: calc(100% - 60px); cursor: pointer; }
+  .export-tip { font-size: 12px; color: var(--muted); padding: 14px 16px 8px; line-height: 1.6; }
+  .export-btn { margin: 0 16px 16px; background: var(--blue); color: #fff; border: none; border-radius: 22px; height: 44px; font-size: 15px; font-weight: 600; width: calc(100% - 32px); cursor: pointer; }
   .export-btn:active { opacity: 0.85; }
 
   nav {
     position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 750px; height: 110px; background: #fff;
+    width: 100%; max-width: 500px; height: 56px; background: #fff;
     display: flex; border-top: 1px solid var(--border); z-index: 20;
   }
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 22px; }
+  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 11px; }
   .nav-item.active { color: var(--blue); }
-  .nav-icon { font-size: 40px; margin-bottom: 4px; }
+  .nav-icon { font-size: 22px; margin-bottom: 2px; }
 
   .mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; display: none; align-items: flex-end; justify-content: center; }
   .mask.show { display: flex; }
   .sheet {
-    background: #fff; width: 100%; max-width: 750px; border-radius: 24px 24px 0 0;
-    max-height: 88vh; overflow-y: auto; padding-bottom: 40px; animation: up .25s ease;
+    background: #fff; width: 100%; max-width: 500px; border-radius: 16px 16px 0 0;
+    max-height: 88vh; overflow-y: auto; padding-bottom: 24px; animation: up .25s ease;
   }
   @keyframes up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 30px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #fff; z-index: 1; }
-  .sheet-title { font-size: 32px; font-weight: 600; }
-  .sheet-close { font-size: 44px; color: var(--muted); cursor: pointer; line-height: 1; }
-  .sheet-body { padding: 10px 30px; }
-  .sheet-actions { display: flex; gap: 20px; padding: 20px 30px 0; }
-  .btn { flex: 1; height: 88px; border-radius: 44px; font-size: 30px; font-weight: 600; border: none; cursor: pointer; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #fff; z-index: 1; }
+  .sheet-title { font-size: 16px; font-weight: 600; }
+  .sheet-close { font-size: 24px; color: var(--muted); cursor: pointer; line-height: 1; }
+  .sheet-body { padding: 6px 16px; }
+  .sheet-actions { display: flex; gap: 12px; padding: 12px 16px 0; }
+  .btn { flex: 1; height: 44px; border-radius: 22px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; }
   .btn.primary { background: var(--blue); color: #fff; }
   .btn.danger { background: #fff2f0; color: var(--red); border: 1px solid #ffccc7; }
   .btn.plain { background: #f5f5f5; color: #666; }
   .btn:active { opacity: 0.85; }
+
+  @media (min-width: 540px) {
+    .record-name { font-size: 17px; }
+    .stat-num { font-size: 28px; }
+  }
 </style>
 </head>
 <body>
@@ -271,12 +277,12 @@
         <div class="amount-row">
           <div class="amount-col">
             <span class="amount-lbl">本月入库</span>
-            <span class="stat-num" style="color:var(--blue);font-size:40px" id="s-monthIn">0</span>
+            <span class="stat-num" style="color:var(--blue);font-size:22px" id="s-monthIn">0</span>
           </div>
           <div class="amount-divider"></div>
           <div class="amount-col">
             <span class="amount-lbl">本月出库</span>
-            <span class="stat-num" style="color:var(--orange);font-size:40px" id="s-monthOut">0</span>
+            <span class="stat-num" style="color:var(--orange);font-size:22px" id="s-monthOut">0</span>
           </div>
         </div>
       </div>
@@ -291,7 +297,7 @@
       <div class="section">
         <div class="section-title">数据导入导出</div>
         <div class="export-tip">导出 CSV 可在 Excel / WPS 打开编辑；导入同样格式的 CSV 可批量恢复或合并数据。</div>
-        <div style="display:flex; gap:20px; padding:0 30px 30px;">
+        <div style="display:flex; gap:12px; padding:0 16px 16px;">
           <button class="export-btn" id="exportBtn" style="margin:0;flex:1">导出表格</button>
           <button class="export-btn" id="importBtn" style="margin:0;flex:1;background:#fff;color:var(--blue);border:1px solid var(--blue)">导入表格</button>
         </div>
@@ -397,14 +403,14 @@ function openDetail(id) {
       <span class="sheet-close" onclick="closeSheet()">×</span>
     </div>
     <div class="sheet-body">
-      <div class="section" style="margin:20px 0;box-shadow:none;border:1px solid var(--border)">
+      <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="section-title">基本信息</div>
         <div class="info-row"><span class="label">货物名称</span><span class="value">${esc(r.name)}</span></div>
         ${r.spec ? `<div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec)}</span></div>` : ''}
         ${r.quantity ? `<div class="info-row"><span class="label">数量</span><span class="value">${esc(r.quantity)} ${esc(r.unit||'件')}</span></div>` : ''}
         <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
       </div>
-      <div class="section" style="margin:20px 0;box-shadow:none;border:1px solid var(--border)">
+      <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="section-title">入库信息</div>
         <div class="info-row"><span class="label">入库日期</span><span class="value">${esc(r.inDate)}</span></div>
         <div class="info-row"><span class="label">采购人</span><span class="value">${esc(r.purchaser) || '-'}</span></div>
@@ -413,7 +419,7 @@ function openDetail(id) {
         ${r.remark ? `<div class="info-row"><span class="label">备注</span><span class="value">${esc(r.remark)}</span></div>` : ''}
       </div>
       ${r.outDate ? `
-      <div class="section" style="margin:20px 0;box-shadow:none;border:1px solid var(--border)">
+      <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="section-title red">出库信息</div>
         <div class="info-row"><span class="label">出库日期</span><span class="value danger">${esc(r.outDate)}</span></div>
         <div class="info-row"><span class="label">领用人</span><span class="value">${esc(r.outReceiver) || '-'}</span></div>
@@ -421,7 +427,7 @@ function openDetail(id) {
         <div class="info-row"><span class="label">领用数量</span><span class="value">${esc(r.outQuantity)} ${esc(r.unit||'件')}</span></div>
         ${r.outPrice ? `<div class="info-row"><span class="label">出库金额</span><span class="value danger">${fmtPrice(r.outPrice, r.outCurrency)}</span></div>` : ''}
       </div>` : `
-      <div class="section" style="margin:20px 0;box-shadow:none;border:1px solid var(--border)">
+      <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="section-title">出库操作（必填）</div>
         <div class="field"><div class="field-label required">出库日期</div><input class="field-input" id="o-date" type="date" value="${today()}"></div>
         <div class="field"><div class="field-label required">领用人</div><input class="field-input" id="o-receiver" placeholder="领用人姓名" value="${esc(r.outReceiver||'')}"></div>
@@ -489,7 +495,7 @@ function editRecord(id) {
   sheet.innerHTML = `
     <div class="sheet-head"><span class="sheet-title">编辑入库信息</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
     <div class="sheet-body">
-      <div class="form-section" style="margin:20px 0;box-shadow:none;border:1px solid var(--border)">
+      <div class="form-section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="field"><div class="field-label required">采购货物名称</div><input class="field-input" id="e-name" value="${esc(r.name)}"></div>
         <div class="field"><div class="field-label required">规格</div><input class="field-input" id="e-spec" value="${esc(r.spec)}"></div>
         <div class="row2">
@@ -637,7 +643,7 @@ function renderStats() {
     <div class="trend-col">
       <div class="trend-bar-wrap">
         <span class="trend-count">${t.count || ''}</span>
-        <div class="trend-bar" style="height:${Math.round(t.count / max * 150)}px"></div>
+        <div class="trend-bar" style="height:${Math.round(t.count / max * 96)}px"></div>
       </div>
       <span class="trend-label">${t.label}</span>
     </div>`).join('');
@@ -667,7 +673,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
     const s = String(c);
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
   }).join(',')).join('\n');
-  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = `课题组耗材_${today()}.csv`;
@@ -756,7 +762,7 @@ function mapCsvRow(c) {
 let toastTimer;
 function toast(msg) {
   let t = document.getElementById('toast');
-  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:20px 40px;border-radius:12px;font-size:28px;z-index:999;pointer-events:none;transition:opacity .2s'; document.body.appendChild(t); }
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.style.cssText = 'position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);background:rgba(0,0,0,.8);color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;z-index:999;pointer-events:none;transition:opacity .2s'; document.body.appendChild(t); }
   t.textContent = msg; t.style.opacity = '1';
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.style.opacity = '0', 1500);
