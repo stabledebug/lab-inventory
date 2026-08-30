@@ -1,21 +1,5 @@
 [
   {
-    "id": "1788086929413",
-    "name": "黄金",
-    "spec": "2",
-    "quantity": "10",
-    "unit": "件",
-    "amount": "2000",
-    "currency": "CNY",
-    "inDate": "2026-08-30",
-    "purchaser": "六六",
-    "reason": "实验室入库",
-    "seller": "小的",
-    "remark": "",
-    "outHistory": [],
-    "createdAt": "2026-08-30T10:48:49.413Z"
-  },
-  {
     "id": "1788086035212",
     "name": "基片",
     "spec": "20",
