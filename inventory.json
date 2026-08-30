@@ -1,5 +1,21 @@
 [
   {
+    "id": "1788093609879",
+    "name": "白银",
+    "spec": "100",
+    "quantity": "100",
+    "unit": "件",
+    "amount": "10000",
+    "currency": "CNY",
+    "inDate": "2026-08-30",
+    "purchaser": "挂机",
+    "reason": "实验室耗材",
+    "seller": "国家珠宝",
+    "remark": "",
+    "outHistory": [],
+    "createdAt": "2026-08-30T12:40:09.879Z"
+  },
+  {
     "id": "1788088044783",
     "name": "黄金",
     "spec": "1g",
