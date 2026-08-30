@@ -12,7 +12,15 @@
     "reason": "实验室测试",
     "seller": "中国黄金",
     "remark": "",
-    "outHistory": [],
+    "outHistory": [
+      {
+        "date": "2026-08-30",
+        "receiver": "马怀冲",
+        "reason": "实验室耗材",
+        "quantity": 20,
+        "remark": ""
+      }
+    ],
     "createdAt": "2026-08-30T11:07:24.783Z"
   },
   {
