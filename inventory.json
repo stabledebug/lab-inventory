@@ -19,6 +19,13 @@
         "reason": "实验室耗材",
         "quantity": 20,
         "remark": ""
+      },
+      {
+        "date": "2026-08-30",
+        "receiver": "小仙女",
+        "reason": "测试",
+        "quantity": 20,
+        "remark": ""
       }
     ],
     "createdAt": "2026-08-30T11:07:24.783Z"
