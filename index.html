@@ -225,7 +225,7 @@
       <div class="stat-cards">
         <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">总记录</div></div>
         <div class="stat-card green"><div class="stat-num" id="s-in">0</div><div class="stat-label">库存品数</div></div>
-        <div class="stat-card orange"><div class="stat-num" id="s-out">0</div><div class="stat-label">已用完</div></div>
+        <div class="stat-card orange"><div class="stat-num" id="s-out">0</div><div class="stat-label">已出库记录</div></div>
         <div class="stat-card blue"><div class="stat-num" id="s-stockQty">0</div><div class="stat-label">库存总数量</div></div>
         <div class="stat-card"><div class="stat-num" id="s-monthIn">0</div><div class="stat-label" id="s-month-title">本月入库</div></div>
       </div>
@@ -339,7 +339,8 @@ function getFilteredList() {
     const matchSearch = !q || [r.name, r.purchaser, r.seller].some(s => (s||'').toLowerCase().includes(q));
     const totalOut = calcTotalOut(r);
     const stock = parseFloat(r.quantity || 0) - totalOut;
-    const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && stock > 0) || (currentFilter === 'out' && stock <= 0);
+    const hasHistory = (r.outHistory && r.outHistory.length > 0) || r.outDate;
+    const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && stock > 0) || (currentFilter === 'out' && hasHistory);
     return matchSearch && matchFilter;
   });
 }
@@ -610,7 +611,7 @@ function renderStats() {
     }
     stockQty += stock;
   });
-  const outStock = total - inStock;
+  const outStock = list.filter(r => (r.outHistory && r.outHistory.length > 0) || r.outDate).length;
   const monthIn = list.filter(r => r.inDate && r.inDate.startsWith(thisMonth)).length;
 
   document.getElementById('s-total').textContent = total;
