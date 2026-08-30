@@ -1,7 +1,7 @@
 [
   {
     "id": "1788069662874",
-    "name": "枪头",
+    "name": "采购机",
     "spec": "10ml",
     "quantity": "1",
     "unit": "件",
@@ -9,8 +9,8 @@
     "currency": "CNY",
     "inDate": "2026-08-30",
     "purchaser": "王瑞",
-    "reason": "测试",
-    "seller": "生物可以",
+    "reason": "测试设备",
+    "seller": "三星电子",
     "remark": "",
     "outDate": "",
     "outReceiver": "",
