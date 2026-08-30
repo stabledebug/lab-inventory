@@ -381,17 +381,23 @@ function renderOutHistory() {
     el.innerHTML = '<div class="empty"><span class="icon">📋</span>暂无出库记录</div>';
     return;
   }
-  el.innerHTML = records.map((r, i) => `
+  el.innerHTML = records.map((r, i) => {
+    const rec = DB.find(x => x.id === r.itemId);
+    const unitVal = rec ? (parseFloat(rec.amount) || 0) / (parseFloat(rec.quantity) || 1) : 0;
+    const outVal = (unitVal * parseFloat(r.quantity || 0)).toFixed(2);
+    const valText = (rec && rec.currency === 'USD') ? '$' + outVal : '¥' + outVal;
+    return `
     <div class="record-card" style="border-left:3px solid #fa8c16" onclick="openDetail('${r.itemId}')">
       <div class="card-header">
         <div class="record-name">${esc(r.itemName)}</div>
-        <span class="badge out" style="background:#fa8c16;color:#fff">-${r.quantity} ${esc(r.itemUnit||'件')}</span>
+        <span class="badge out" style="background:#fa8c16;color:#fff">-${r.quantity} ${esc(r.itemUnit||'件')} (${valText})</span>
       </div>
       <div class="info-row"><span class="label">出库日期</span><span class="value">${esc(r.date)}</span></div>
       <div class="info-row"><span class="label">领用人</span><span class="value">${esc(r.receiver) || '-'}</span></div>
       <div class="info-row"><span class="label">领用原因</span><span class="value">${esc(r.reason) || '-'}</span></div>
       ${r.remark ? '<div class="info-row"><span class="label">备注</span><span class="value">'+esc(r.remark)+'</span></div>' : ''}
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function renderRecords() {
@@ -414,7 +420,10 @@ function renderRecords() {
       <div class="info-row"><span class="label">入库日期</span><span class="value">${esc(r.inDate)}</span></div>
       <div class="info-row"><span class="label">采购人</span><span class="value">${esc(r.purchaser) || '-'}</span></div>
       <div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec) || '-'}</span></div>
-      <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
+      ${!isOut ? `
+      <div class="info-row"><span class="label">当前库存价值</span><span class="value price">${fmtPrice(parseFloat(r.amount||0) * stock / parseFloat(r.quantity||1), r.currency)}</span></div>`
+      : `
+      <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>`}
     </div>`;
   }).join('');
 }
