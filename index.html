@@ -339,7 +339,7 @@ function ensureToken() {
     sheet.innerHTML = `<div class="sheet-head"><span class="sheet-title">设置访问令牌</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
       <div class="sheet-body" style="padding:16px">
         <p style="font-size:13px;color:#666;line-height:1.6;margin-bottom:12px">数据保存在 GitHub 仓库，需粘贴一个 <b>Fine-grained PAT</b>（仅授权 lab-inventory 仓库 Contents 读写）才能读写。令牌只存在本机浏览器，不会上传。</p>
-        <input class="field-input" id="tokInput" placeholder="粘贴 github_pat_... 令牌" style="margin-bottom:16px">
+        <input class="field-input" id="tokInput" placeholder="粘贴你的访问令牌 PAT" style="margin-bottom:16px">
         <button class="btn primary" id="tokSave">保存并使用</button>
       </div>`;
     document.getElementById('mask').classList.add('show');
