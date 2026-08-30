@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "1788084901764",
+    "name": "洗头",
+    "spec": "10",
+    "quantity": "1",
+    "unit": "件",
+    "amount": "2",
+    "currency": "CNY",
+    "inDate": "2026-08-30",
+    "purchaser": "王瑞",
+    "reason": "课题研究",
+    "seller": "中国银行",
+    "remark": "",
+    "outDate": "",
+    "outReceiver": "",
+    "outReason": "",
+    "outQuantity": "",
+    "outPrice": "",
+    "outCurrency": "CNY",
+    "outRemark": "",
+    "createdAt": "2026-08-30T10:15:01.764Z"
+  }
+]
