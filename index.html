@@ -428,13 +428,18 @@ function openDetail(id) {
   const isOut = stock <= 0;
   const maxOut = Math.min(stock, 999999);
   const sheet = document.getElementById('sheet');
+  const unitVal = (parseFloat(r.amount) || 0) / (parseFloat(r.quantity) || 1);
   const historyHtml = hist.length > 0
-    ? hist.map(h => `
+    ? hist.map(h => {
+        const outVal = (unitVal * parseFloat(h.quantity || 0)).toFixed(2);
+        const valText = r.currency === 'USD' ? '$' + outVal : '¥' + outVal;
+        return `
         <div class="info-row" style="background:#fff5f5;padding:8px 12px;border-radius:6px;margin-bottom:8px">
           <span class="label">${esc(h.date)} ${esc(h.receiver)}</span>
-          <span class="value danger">-${h.quantity} ${esc(r.unit||'件')}</span>
+          <span class="value danger">-${h.quantity} ${esc(r.unit||'件')} (${valText})</span>
           <span class="value" style="display:block;font-size:12px;color:#999">${esc(h.reason)||'-'}</span>
-        </div>`).join('')
+        </div>`;
+      }).join('')
     : '<div style="color:#999;font-size:13px;padding:8px 0">暂无出库记录</div>';
   sheet.innerHTML = `
     <div class="sheet-head"><span class="sheet-title">${esc(r.name)}</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
@@ -712,7 +717,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   // 表头：基本信息 + 出库历史
   const header = ['货物名称','规格','入库数量','单位','当前库存','入库日期','采购人','采购理由','金额','币种','卖方公司','入库备注','状态'];
   // 每条出库记录的列
-  const outHeader = ['出库日期','领用人','领用原因','出库数量','出库备注'];
+  const outHeader = ['出库日期','领用人','领用原因','出库数量','出库金额','出库备注'];
   const allHeader = [...header, ...outHeader];
   
   const rows = [];
@@ -727,11 +732,13 @@ document.getElementById('exportBtn').addEventListener('click', () => {
     ];
     if (hist.length === 0) {
       // 无出库记录，只导出一行
-      rows.push([...base, '', '', '', '', '']);
+      rows.push([...base, '', '', '', '', '', '']);
     } else {
       // 每条出库记录一行，每行都显示完整物品信息
       hist.forEach(h => {
-        rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
+        const unitVal = (parseFloat(r.amount) || 0) / (parseFloat(r.quantity) || 1);
+        const outVal = (unitVal * parseFloat(h.quantity || 0)).toFixed(2);
+        rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, outVal, h.remark||'']);
       });
     }
   });
