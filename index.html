@@ -302,7 +302,7 @@
           <button class="export-btn" id="importBtn" style="margin:0;flex:1;background:#fff;color:var(--blue);border:1px solid var(--blue)">导入表格</button>
         </div>
         <div style="padding:0 16px 16px;">
-          <button class="export-btn" id="tokenBtn" style="margin:0;width:100%;background:#fff;color:var(--muted);border:1px solid #ddd">更改访问令牌</button>
+          <button class="export-btn" id="tokenBtn" style="margin:0;width:100%;background:#fff;color:var(--muted);border:1px solid #ddd">更改访问密码</button>
         </div>
         <input type="file" id="importFile" accept=".csv" style="display:none">
       </div>
@@ -321,32 +321,30 @@
 </div>
 
 <script>
-/* ===== GitHub 云端同步（方案 B）=====
-   数据存在仓库的 inventory.json，所有人共享同一份。
-   令牌首次打开时粘贴，仅存本机浏览器（localStorage），不写入仓库源码，
-   以免触发 GitHub 密钥扫描拦截推送 / 自动撤销令牌。 */
-const REPO = 'stabledebug/lab-inventory';
-const FILE = 'inventory.json';
+/* ===== 云端同步（方案 C：Vercel 中转）=====
+   数据经 Vercel 函数代理读写 GitHub 仓库 inventory.json，课题组共享同一份。
+   GitHub token 藏在 Vercel 后端环境变量，前端只用共享访问密码（存本机浏览器）。 */
+const API_BASE = '/api/inventory';
 
 let DB = [];
 
-function getToken() { return localStorage.getItem('lab_gh_token') || ''; }
-function ensureToken() {
-  const t = getToken();
-  if (t) return Promise.resolve(t);
+function getPwd() { return localStorage.getItem('lab_pwd') || ''; }
+function ensurePwd() {
+  const p = getPwd();
+  if (p) return Promise.resolve(p);
   return new Promise(resolve => {
     const sheet = document.getElementById('sheet');
-    sheet.innerHTML = `<div class="sheet-head"><span class="sheet-title">设置访问令牌</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
+    sheet.innerHTML = `<div class="sheet-head"><span class="sheet-title">输入访问密码</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
       <div class="sheet-body" style="padding:16px">
-        <p style="font-size:13px;color:#666;line-height:1.6;margin-bottom:12px">数据保存在 GitHub 仓库，需粘贴一个 <b>Fine-grained PAT</b>（仅授权 lab-inventory 仓库 Contents 读写）才能读写。令牌只存在本机浏览器，不会上传。</p>
-        <input class="field-input" id="tokInput" placeholder="粘贴你的访问令牌 PAT" style="margin-bottom:16px">
-        <button class="btn primary" id="tokSave">保存并使用</button>
+        <p style="font-size:13px;color:#666;line-height:1.6;margin-bottom:12px">请输入课题组共享的访问密码，即可读取 / 写入库存数据。密码只存在本机浏览器，不会上传。</p>
+        <input class="field-input" id="pwdInput" type="password" placeholder="输入访问密码" style="margin-bottom:16px">
+        <button class="btn primary" id="pwdSave">保存并使用</button>
       </div>`;
     document.getElementById('mask').classList.add('show');
-    document.getElementById('tokSave').onclick = () => {
-      const v = document.getElementById('tokInput').value.trim();
-      if (!v) { toast('请输入令牌'); return; }
-      localStorage.setItem('lab_gh_token', v);
+    document.getElementById('pwdSave').onclick = () => {
+      const v = document.getElementById('pwdInput').value;
+      if (!v) { toast('请输入密码'); return; }
+      localStorage.setItem('lab_pwd', v);
       document.getElementById('mask').classList.remove('show');
       resolve(v);
     };
@@ -354,24 +352,23 @@ function ensureToken() {
 }
 
 async function apiGet() {
-  const tk = await ensureToken();
-  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
-    headers: { Authorization: `Bearer ${tk}`, Accept: 'application/vnd.github+json' }
-  });
+  const pwd = await ensurePwd();
+  const r = await fetch(API_BASE, { headers: { 'x-password': pwd } });
   if (r.status === 404) return { sha: null, data: [] };
+  if (r.status === 401) throw new Error('密码错误');
   if (!r.ok) throw new Error('读取失败 ' + r.status);
   const j = await r.json();
   const txt = decodeURIComponent(escape(atob(j.content.replace(/\s/g, ''))));
   return { sha: j.sha, data: JSON.parse(txt) };
 }
 async function apiPut(data, sha) {
-  const tk = await ensureToken();
+  const pwd = await ensurePwd();
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-  const body = { message: 'update inventory ' + new Date().toISOString(), content };
+  const body = { content };
   if (sha) body.sha = sha;
-  return fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+  return fetch(API_BASE, {
     method: 'PUT',
-    headers: { Authorization: `Bearer ${tk}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    headers: { 'x-password': pwd, 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
 }
@@ -752,8 +749,8 @@ document.getElementById('exportBtn').addEventListener('click', () => {
 
 document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
 document.getElementById('tokenBtn').addEventListener('click', () => {
-  localStorage.removeItem('lab_gh_token');
-  ensureToken().then(() => { toast('令牌已更新'); showView('records'); });
+  localStorage.removeItem('lab_pwd');
+  ensurePwd().then(() => { toast('密码已更新'); showView('records'); });
 });
 document.getElementById('importFile').addEventListener('change', async e => {
   const file = e.target.files && e.target.files[0];
