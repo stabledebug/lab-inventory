@@ -73,6 +73,13 @@
         "reason": "测试",
         "quantity": 2,
         "remark": ""
+      },
+      {
+        "date": "2026-08-30",
+        "receiver": "马怀冲",
+        "reason": "测试",
+        "quantity": 2,
+        "remark": ""
       }
     ]
   }
