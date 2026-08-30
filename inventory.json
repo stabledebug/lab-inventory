@@ -27,6 +27,13 @@
         "reason": "实验室耗材",
         "quantity": 2,
         "remark": ""
+      },
+      {
+        "date": "2026-08-30",
+        "receiver": "李三",
+        "reason": "晚",
+        "quantity": 3,
+        "remark": ""
       }
     ]
   }
