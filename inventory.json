@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "1788077147039",
+    "name": "角磨机",
+    "spec": "10",
+    "quantity": "10",
+    "unit": "件",
+    "amount": "10",
+    "currency": "CNY",
+    "inDate": "2026-08-30",
+    "purchaser": "王瑞",
+    "reason": "课题研究",
+    "seller": "新林院",
+    "remark": "",
+    "outDate": "",
+    "outReceiver": "",
+    "outReason": "",
+    "outQuantity": "",
+    "outPrice": "",
+    "outCurrency": "CNY",
+    "outRemark": "",
+    "createdAt": "2026-08-30T08:05:47.040Z"
+  }
+]
