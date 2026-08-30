@@ -5,3 +5,7 @@ compatibility_date = "2024-01-01"
 [assets]
 directory = "."
 binding = "ASSETS"
+
+[[kv_namespaces]]
+binding = "SECRETS"
+id = "2f415a20baa0488ca6aa0b09259420c7"
