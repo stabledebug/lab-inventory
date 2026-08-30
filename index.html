@@ -314,8 +314,11 @@ document.getElementById('searchInput').addEventListener('input', renderRecords);
 function getFilteredList() {
   const q = document.getElementById('searchInput').value.toLowerCase();
   return DB.filter(r => {
-    const matchSearch = !q || [r.name, r.purchaser, r.outReceiver, r.seller].some(s => (s||'').toLowerCase().includes(q));
-    const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && !r.outDate) || (currentFilter === 'out' && r.outDate);
+    const matchSearch = !q || [r.name, r.purchaser, r.seller].some(s => (s||'').toLowerCase().includes(q));
+    const hist = r.outHistory || [];
+    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const stock = parseFloat(r.quantity) - totalOut;
+    const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && stock > 0) || (currentFilter === 'out' && stock <= 0);
     return matchSearch && matchFilter;
   });
 }
@@ -327,66 +330,71 @@ function renderRecords() {
     el.innerHTML = '<div class="empty"><span class="icon">📭</span>暂无记录</div>';
     return;
   }
-  el.innerHTML = list.map(r => `
+  el.innerHTML = list.map(r => {
+    const hist = r.outHistory || [];
+    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const stock = parseFloat(r.quantity) - totalOut;
+    const isOut = stock <= 0;
+    return `
     <div class="record-card" onclick="openDetail('${r.id}')">
       <div class="card-header">
         <div class="record-name">${esc(r.name)}</div>
-        <span class="badge ${r.outDate ? 'out' : 'in'}">${r.outDate ? '已出库' : '库存中'}</span>
+        <span class="badge ${isOut ? 'out' : 'in'}">${isOut ? '已用完' : '库存 ' + stock + '/' + r.quantity}</span>
       </div>
       <div class="info-row"><span class="label">入库日期</span><span class="value">${esc(r.inDate)}</span></div>
       <div class="info-row"><span class="label">采购人</span><span class="value">${esc(r.purchaser) || '-'}</span></div>
-      <div class="info-row"><span class="label">数量/规格</span><span class="value">${esc(r.quantity)} ${esc(r.unit||'件')} / ${esc(r.spec) || '-'}</span></div>
+      <div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec) || '-'}</span></div>
       <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function openDetail(id) {
   const r = DB.find(x => x.id === id);
   if (!r) return;
+  const hist = r.outHistory || [];
+  const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+  const stock = parseFloat(r.quantity) - totalOut;
+  const isOut = stock <= 0;
+  const maxOut = Math.min(stock, 999999);
   const sheet = document.getElementById('sheet');
+  const historyHtml = hist.length > 0
+    ? hist.map(h => `
+        <div class="info-row" style="background:#fff5f5;padding:8px 12px;border-radius:6px;margin-bottom:8px">
+          <span class="label">${esc(h.date)} ${esc(h.receiver)}</span>
+          <span class="value danger">-${h.quantity} ${esc(r.unit||'件')}</span>
+          <span class="value" style="display:block;font-size:12px;color:#999">${esc(h.reason)||'-'}</span>
+        </div>`).join('')
+    : '<div style="color:#999;font-size:13px;padding:8px 0">暂无出库记录</div>';
   sheet.innerHTML = `
     <div class="sheet-head"><span class="sheet-title">${esc(r.name)}</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
     <div class="sheet-body">
       <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
-        <div class="section-title">入库信息</div>
+        <div class="section-title">入库信息 <span style="float:right;font-size:14px;color:${isOut?'#ff4d4f':'#52c41a'}">库存 ${isOut ? 0 : stock} / ${r.quantity} ${esc(r.unit||'件')}</span></div>
         <div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec) || '-'}</span></div>
-        <div class="info-row"><span class="label">数量</span><span class="value">${esc(r.quantity)} ${esc(r.unit||'件')}</span></div>
+        <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
         <div class="info-row"><span class="label">入库日期</span><span class="value">${esc(r.inDate)}</span></div>
         <div class="info-row"><span class="label">采购人</span><span class="value">${esc(r.purchaser) || '-'}</span></div>
         <div class="info-row"><span class="label">采购理由</span><span class="value">${esc(r.reason) || '-'}</span></div>
-        <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
         <div class="info-row"><span class="label">卖方公司</span><span class="value">${esc(r.seller) || '-'}</span></div>
         <div class="info-row"><span class="label">备注</span><span class="value">${esc(r.remark) || '-'}</span></div>
       </div>
-      ${r.outDate ? `
       <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
-        <div class="section-title red">出库信息</div>
-        <div class="info-row"><span class="label">出库日期</span><span class="value">${esc(r.outDate)}</span></div>
-        <div class="info-row"><span class="label">领用人</span><span class="value">${esc(r.outReceiver) || '-'}</span></div>
-        <div class="info-row"><span class="label">领用原因</span><span class="value">${esc(r.outReason) || '-'}</span></div>
-        <div class="info-row"><span class="label">领用数量</span><span class="value">${esc(r.outQuantity)} ${esc(r.unit||'件')}</span></div>
-        ${r.outPrice ? `<div class="info-row"><span class="label">出库金额</span><span class="value danger">${fmtPrice(r.outPrice, r.outCurrency)}</span></div>` : ''}
-      </div>` : `
+        <div class="section-title red">出库记录</div>
+        ${historyHtml}
+      </div>
+      ${!isOut ? `
       <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
-        <div class="section-title">出库操作（必填）</div>
+        <div class="section-title">出库操作（库存 ${stock} ${esc(r.unit||'件')}）</div>
         <div class="field"><div class="field-label required">出库日期</div><input class="field-input" id="o-date" type="date" value="${today()}"></div>
-        <div class="field"><div class="field-label required">领用人</div><input class="field-input" id="o-receiver" placeholder="领用人姓名" value="${esc(r.outReceiver||'')}"></div>
-        <div class="field"><div class="field-label required">领用原因</div><input class="field-input" id="o-reason" placeholder="如：某某课题实验使用" value="${esc(r.outReason||'')}"></div>
-        <div class="field"><div class="field-label required">领用数量</div><input class="field-input" id="o-quantity" type="number" inputmode="decimal" placeholder="本次领用数量"></div>
-        <div class="row2">
-          <div class="field"><div class="field-label">出库金额</div><input class="field-input" id="o-price" type="number" inputmode="decimal" placeholder="0.00"></div>
-          <div class="field"><div class="field-label">币种</div>
-            <select class="field-select" id="o-currency">
-              <option value="CNY" ${r.outCurrency!=='USD'?'selected':''}>人民币 ¥</option>
-              <option value="USD" ${r.outCurrency==='USD'?'selected':''}>美元 $</option>
-            </select>
-          </div>
-        </div>
-        <div class="field"><div class="field-label">出库备注</div><textarea class="field-textarea" id="o-remark" placeholder="选填">${esc(r.outRemark||'')}</textarea></div>
-      </div>`}
+        <div class="field"><div class="field-label required">领用人</div><input class="field-input" id="o-receiver" placeholder="领用人姓名"></div>
+        <div class="field"><div class="field-label required">领用原因</div><input class="field-input" id="o-reason" placeholder="如：某某课题实验使用"></div>
+        <div class="field"><div class="field-label required">本次出库数量</div><input class="field-input" id="o-quantity" type="number" inputmode="decimal" placeholder="最多 ${stock}" max="${maxOut}"></div>
+        <div class="field"><div class="field-label">出库备注</div><textarea class="field-textarea" id="o-remark" placeholder="选填"></textarea></div>
+      </div>` : ''}
     </div>
     <div class="sheet-actions">
-      ${r.outDate ? '' : `<button class="btn primary" onclick="confirmOut('${r.id}')">确认出库</button>`}
+      ${!isOut ? `<button class="btn primary" onclick="confirmOut('${r.id}')">确认出库</button>` : '<button class="btn plain" disabled style="flex:1">已用完</button>'}
       <button class="btn plain" onclick="editRecord('${r.id}')">编辑</button>
       <button class="btn danger" onclick="delRecord('${r.id}')">删除</button>
     </div>`;
@@ -399,22 +407,28 @@ async function confirmOut(id) {
   const outDate = document.getElementById('o-date').value;
   const outReceiver = document.getElementById('o-receiver').value.trim();
   const outReason = document.getElementById('o-reason').value.trim();
-  const outQuantity = document.getElementById('o-quantity').value;
+  const outQuantity = parseFloat(document.getElementById('o-quantity').value);
   if (!outDate) { toast('请填写出库日期'); return; }
   if (!outReceiver) { toast('请填写领用人'); return; }
   if (!outReason) { toast('请填写领用原因'); return; }
-  if (!outQuantity) { toast('请填写领用数量'); return; }
+  if (!outQuantity || outQuantity <= 0) { toast('请填写出库数量'); return; }
   await ensureFresh();
   const r = DB.find(x => x.id === id);
   if (!r) return;
-  r.outDate = outDate;
-  r.outReceiver = outReceiver;
-  r.outReason = outReason;
-  r.outQuantity = outQuantity;
-  r.outPrice = document.getElementById('o-price').value;
-  r.outCurrency = document.getElementById('o-currency').value;
-  r.outRemark = document.getElementById('o-remark').value.trim();
-  try { await push(); closeSheet(); renderRecords(); toast('出库成功'); }
+  const hist = r.outHistory || [];
+  const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+  const stock = parseFloat(r.quantity) - totalOut;
+  if (outQuantity > stock) { toast('出库数量不能超过库存 ' + stock); return; }
+  // 追加出库记录
+  hist.push({
+    date: outDate,
+    receiver: outReceiver,
+    reason: outReason,
+    quantity: outQuantity,
+    remark: document.getElementById('o-remark').value.trim()
+  });
+  r.outHistory = hist;
+  try { await push(); openDetail(id); renderRecords(); toast('出库成功（剩余 ' + (stock - outQuantity) + '）'); }
   catch (e) { toast(e.message); }
 }
 
@@ -517,7 +531,7 @@ document.getElementById('addForm').addEventListener('submit', async e => {
     amount, currency: document.getElementById('f-currency').value,
     inDate, purchaser, reason, seller,
     remark: document.getElementById('f-remark').value.trim(),
-    outDate: '', outReceiver: '', outReason: '', outQuantity: '', outPrice: '', outCurrency: 'CNY', outRemark: '',
+    outHistory: [],
     createdAt: new Date().toISOString(),
   };
   DB.unshift(rec);
@@ -538,19 +552,26 @@ function renderStats() {
   const y = now.getFullYear(), m = now.getMonth() + 1;
   const thisMonth = `${y}-${String(m).padStart(2,'0')}`;
   const total = list.length;
-  const inStock = list.filter(r => !r.outDate).length;
-  const outStock = list.filter(r => !!r.outDate).length;
-  const monthIn = list.filter(r => r.inDate && r.inDate.startsWith(thisMonth)).length;
-  const monthOut = list.filter(r => r.outDate && r.outDate.startsWith(thisMonth)).length;
-
-  let stockCny = 0, stockUsd = 0, inCny = 0, inUsd = 0;
+  // 计算库存数量
+  let inStock = 0, stockCny = 0, stockUsd = 0, inCny = 0, inUsd = 0, stockQty = 0;
   list.forEach(r => {
-    const p = parseFloat(r.amount);
-    if (!isNaN(p)) {
-      if (r.currency === 'USD') inUsd += p; else inCny += p;
-      if (!r.outDate) { if (r.currency === 'USD') stockUsd += p; else stockCny += p; }
+    const qty = parseFloat(r.quantity) || 0;
+    const price = parseFloat(r.amount) || 0;
+    const hist = r.outHistory || [];
+    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const stock = qty - totalOut;
+    if (stock > 0) inStock++;
+    // 按比例计算库存价值
+    if (price > 0 && qty > 0) {
+      const ratio = stock / qty;
+      const stockVal = price * ratio;
+      if (r.currency === 'USD') { stockUsd += stockVal; inUsd += price; }
+      else { stockCny += stockVal; inCny += price; }
     }
+    stockQty += stock;
   });
+  const outStock = total - inStock;
+  const monthIn = list.filter(r => r.inDate && r.inDate.startsWith(thisMonth)).length;
 
   document.getElementById('s-total').textContent = total;
   document.getElementById('s-in').textContent = inStock;
@@ -580,24 +601,33 @@ function renderStats() {
 
   const recent = list.slice().sort((a,b) => new Date(b.inDate) - new Date(a.inDate)).slice(0, 5);
   document.getElementById('recentList').innerHTML = recent.length
-    ? recent.map(r => `
+    ? recent.map(r => {
+      const hist = r.outHistory || [];
+      const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+      const stock = (parseFloat(r.quantity) || 0) - totalOut;
+      const isOut = stock <= 0;
+      return `
       <div class="recent-item" onclick="openDetail('${r.id}')">
-        <div><span class="recent-name">${esc(r.name)}</span><span class="recent-date">${esc(r.inDate)} · ${esc(r.purchaser) || '—'}</span></div>
-        <span class="dot ${r.outDate ? 'out' : 'in'}"></span>
-      </div>`).join('')
+        <div><span class="recent-name">${esc(r.name)}</span><span class="recent-date">${esc(r.inDate)} · ${esc(r.purchaser) || '—'} · 库存 ${isOut ? 0 : stock}</span></div>
+        <span class="dot ${isOut ? 'out' : 'in'}"></span>
+      </div>`;
+    }).join('')
     : `<div class="empty" style="padding:40px">暂无入库记录</div>`;
 }
 
 document.getElementById('exportBtn').addEventListener('click', () => {
   if (!DB.length) { toast('暂无数据可导出'); return; }
-  const header = ['货物名称','规格','数量','单位','入库日期','采购人','采购理由','金额','币种','卖方公司','入库备注','出库日期','领用人','领用原因','领用数量','出库金额','出库币种','出库备注','状态'];
-  const rows = DB.map(r => [
-    r.name, r.spec||'', r.quantity||'', r.unit||'', r.inDate, r.purchaser||'', r.reason||'',
-    r.amount||'', r.currency==='USD'?'美元':'人民币', r.seller||'', r.remark||'',
-    r.outDate||'', r.outReceiver||'', r.outReason||'', r.outQuantity||'',
-    r.outPrice||'', r.outCurrency==='USD'?'美元':'人民币', r.outRemark||'',
-    r.outDate ? '已出库' : '库存中'
-  ]);
+  const header = ['货物名称','规格','入库数量','单位','当前库存','入库日期','采购人','采购理由','金额','币种','卖方公司','入库备注','累计出库次数','累计出库数量','状态'];
+  const rows = DB.map(r => {
+    const hist = r.outHistory || [];
+    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const stock = (parseFloat(r.quantity) || 0) - totalOut;
+    return [
+      r.name, r.spec||'', r.quantity||'', r.unit||'', stock, r.inDate, r.purchaser||'', r.reason||'',
+      r.amount||'', r.currency==='USD'?'美元':'人民币', r.seller||'', r.remark||'',
+      hist.length, totalOut, stock <= 0 ? '已用完' : '库存中'
+    ];
+  });
   const csv = [header, ...rows].map(row => row.map(c => {
     const s = String(c);
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
