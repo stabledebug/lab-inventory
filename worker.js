@@ -5,18 +5,23 @@ export default {
       
       // API 路由
       if (url.pathname === '/api/inventory') {
+        // 从 KV 读取密码和 token
+        const storedPassword = await env.SECRETS.get('ACCESS_PASSWORD');
+        const ghToken = await env.SECRETS.get('GH_TOKEN');
+        
         const pwd = request.headers.get('x-password');
-        if (!pwd || pwd !== env.ACCESS_PASSWORD) {
+        if (!pwd || pwd !== storedPassword) {
           return new Response(JSON.stringify({ error: 'unauthorized' }), {
             status: 401,
             headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
           });
         }
+        
         const repo = env.GH_REPO || 'stabledebug/lab-inventory';
         const file = env.GH_FILE || 'inventory.json';
         const ghUrl = `https://api.github.com/repos/${repo}/contents/${file}`;
         const ghHeaders = {
-          Authorization: `Bearer ${env.GH_TOKEN}`,
+          Authorization: `Bearer ${ghToken}`,
           Accept: 'application/vnd.github+json',
           'User-Agent': 'lab-inventory-proxy',
         };
@@ -24,7 +29,6 @@ export default {
           if (request.method === 'GET') {
             const r = await fetch(ghUrl, { headers: ghHeaders });
             if (r.status === 404) {
-              // 文件不存在，返回空对象（前端应处理为空数组）
               return new Response(JSON.stringify({}), { 
                 status: 200, 
                 headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' } 
@@ -68,14 +72,12 @@ export default {
         return env.ASSETS.fetch(request);
       }
       
-      // 如果 ASSETS 不可用，返回错误信息
-      return new Response('Assets binding not available. Check wrangler.toml [assets] config.', { 
+      return new Response('Assets binding not available', { 
         status: 500,
         headers: { 'Content-Type': 'text/plain' }
       });
       
     } catch (e) {
-      // 捕获所有未处理的错误
       return new Response('Worker error: ' + (e.message || e) + '\n' + (e.stack || ''), { 
         status: 500,
         headers: { 'Content-Type': 'text/plain' }
