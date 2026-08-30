@@ -14,57 +14,5 @@
     "remark": "",
     "outHistory": [],
     "createdAt": "2026-08-30T10:33:55.212Z"
-  },
-  {
-    "id": "1788085487620",
-    "name": "黄金",
-    "spec": "2克",
-    "quantity": "10",
-    "unit": "件",
-    "amount": "2000",
-    "currency": "CNY",
-    "inDate": "2026-08-30",
-    "purchaser": "张三",
-    "reason": "材料费",
-    "seller": "中国黄金",
-    "remark": "",
-    "outDate": "2026-08-30",
-    "outReceiver": "马怀冲",
-    "outReason": "凌总",
-    "outQuantity": "1",
-    "outPrice": "200",
-    "outCurrency": "CNY",
-    "outRemark": "",
-    "createdAt": "2026-08-30T10:24:47.620Z",
-    "outHistory": [
-      {
-        "date": "2026-08-30",
-        "receiver": "马怀冲",
-        "reason": "实验室耗材",
-        "quantity": 2,
-        "remark": ""
-      },
-      {
-        "date": "2026-08-30",
-        "receiver": "李三",
-        "reason": "晚",
-        "quantity": 3,
-        "remark": ""
-      },
-      {
-        "date": "2026-08-30",
-        "receiver": "马怀冲",
-        "reason": "测试",
-        "quantity": 2,
-        "remark": ""
-      },
-      {
-        "date": "2026-08-30",
-        "receiver": "马怀冲",
-        "reason": "测试",
-        "quantity": 2,
-        "remark": ""
-      }
-    ]
   }
 ]
