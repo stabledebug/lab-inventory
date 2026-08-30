@@ -179,9 +179,11 @@
       <div class="filter-tabs">
         <div class="tab active" data-filter="all">全部</div>
         <div class="tab" data-filter="in">库存中</div>
-        <div class="tab" data-filter="out">已出库</div>
+        <div class="tab" data-filter="out">已用完</div>
+        <div class="tab" data-filter="history">出库历史</div>
       </div>
       <div class="record-list" id="recordList"></div>
+      <div class="record-list" id="historyList" style="display:none"></div>
     </div>
 
     <div id="view-add" class="view">
@@ -225,7 +227,7 @@
       <div class="stat-cards">
         <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">总记录</div></div>
         <div class="stat-card green"><div class="stat-num" id="s-in">0</div><div class="stat-label">库存品数</div></div>
-        <div class="stat-card orange"><div class="stat-num" id="s-out">0</div><div class="stat-label">已出库记录</div></div>
+        <div class="stat-card orange"><div class="stat-num" id="s-out">0</div><div class="stat-label">已用完</div></div>
         <div class="stat-card blue"><div class="stat-num" id="s-stockQty">0</div><div class="stat-label">库存总数量</div></div>
         <div class="stat-card"><div class="stat-num" id="s-monthIn">0</div><div class="stat-label" id="s-month-title">本月入库</div></div>
       </div>
@@ -317,10 +319,20 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
   currentFilter = t.dataset.filter;
-  renderRecords();
+  if (currentFilter === 'history') {
+    document.getElementById('recordList').style.display = 'none';
+    document.getElementById('historyList').style.display = 'block';
+    renderOutHistory();
+  } else {
+    document.getElementById('recordList').style.display = 'block';
+    document.getElementById('historyList').style.display = 'none';
+    renderRecords();
+  }
 }));
 
-document.getElementById('searchInput').addEventListener('input', renderRecords);
+document.getElementById('searchInput').addEventListener('input', () => {
+  if (currentFilter === 'history') renderOutHistory(); else renderRecords();
+});
 
 // 计算总出库数量（兼容新旧格式）
 function calcTotalOut(r) {
@@ -339,10 +351,47 @@ function getFilteredList() {
     const matchSearch = !q || [r.name, r.purchaser, r.seller].some(s => (s||'').toLowerCase().includes(q));
     const totalOut = calcTotalOut(r);
     const stock = parseFloat(r.quantity || 0) - totalOut;
-    const hasHistory = (r.outHistory && r.outHistory.length > 0) || r.outDate;
-    const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && stock > 0) || (currentFilter === 'out' && hasHistory);
+    const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && stock > 0) || (currentFilter === 'out' && stock <= 0);
     return matchSearch && matchFilter;
   });
+}
+
+function renderOutHistory() {
+  const el = document.getElementById('historyList');
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  // 收集所有出库记录
+  const records = [];
+  DB.forEach(r => {
+    const hist = r.outHistory || [];
+    hist.forEach(h => {
+      if (!q || r.name.toLowerCase().includes(q) || (h.receiver||'').toLowerCase().includes(q) || (h.reason||'').toLowerCase().includes(q)) {
+        records.push({ ...h, itemName: r.name, itemSpec: r.spec, itemUnit: r.unit, itemId: r.id, currency: r.currency });
+      }
+    });
+    // 兼容旧格式
+    if (r.outDate && !r.outQuantity) {
+      if (!q || r.name.toLowerCase().includes(q)) {
+        records.push({ date: r.outDate, receiver: r.outReceiver, reason: r.outReason, quantity: parseFloat(r.outQuantity)||0, remark: r.outRemark, itemName: r.name, itemSpec: r.spec, itemUnit: r.unit, itemId: r.id, currency: r.currency });
+      }
+    }
+  });
+  // 按日期倒序
+  records.sort((a, b) => new Date(b.date) - new Date(a.date));
+  if (!records.length) {
+    el.innerHTML = '<div class="empty"><span class="icon">📋</span>暂无出库记录</div>';
+    return;
+  }
+  el.innerHTML = records.map((r, i) => `
+    <div class="record-card" style="border-left:3px solid #fa8c16" onclick="openDetail('${r.itemId}')">
+      <div class="card-header">
+        <div class="record-name">${esc(r.itemName)}</div>
+        <span class="badge out" style="background:#fa8c16;color:#fff">-${r.quantity} ${esc(r.itemUnit||'件')}</span>
+      </div>
+      <div class="info-row"><span class="label">出库日期</span><span class="value">${esc(r.date)}</span></div>
+      <div class="info-row"><span class="label">领用人</span><span class="value">${esc(r.receiver) || '-'}</span></div>
+      <div class="info-row"><span class="label">领用原因</span><span class="value">${esc(r.reason) || '-'}</span></div>
+      ${r.remark ? '<div class="info-row"><span class="label">备注</span><span class="value">'+esc(r.remark)+'</span></div>' : ''}
+    </div>`).join('');
 }
 
 function renderRecords() {
@@ -611,7 +660,7 @@ function renderStats() {
     }
     stockQty += stock;
   });
-  const outStock = list.filter(r => (r.outHistory && r.outHistory.length > 0) || r.outDate).length;
+  const outStock = total - inStock;
   const monthIn = list.filter(r => r.inDate && r.inDate.startsWith(thisMonth)).length;
 
   document.getElementById('s-total').textContent = total;
