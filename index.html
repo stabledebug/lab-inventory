@@ -383,9 +383,14 @@ function renderOutHistory() {
   }
   el.innerHTML = records.map((r, i) => {
     const rec = DB.find(x => x.id === r.itemId);
-    const unitVal = rec ? (parseFloat(rec.amount) || 0) / (parseFloat(rec.quantity) || 1) : 0;
+    if (!rec) return '';
+    const unitVal = (parseFloat(rec.amount) || 0) / (parseFloat(rec.quantity) || 1);
     const outVal = (unitVal * parseFloat(r.quantity || 0)).toFixed(2);
-    const valText = (rec && rec.currency === 'USD') ? '$' + outVal : '¥' + outVal;
+    const valText = rec.currency === 'USD' ? '$' + outVal : '¥' + outVal;
+    const hist = rec.outHistory || [];
+    const recIdx = hist.findIndex(h => h.date === r.date && h.receiver === r.receiver && String(h.quantity) === String(r.quantity));
+    const totalBefore = hist.slice(0, recIdx >= 0 ? recIdx : hist.indexOf(r)).reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const stockAfter = (parseFloat(rec.quantity) || 0) - totalBefore - (parseFloat(r.quantity) || 0);
     return `
     <div class="record-card" style="border-left:3px solid #fa8c16" onclick="openDetail('${r.itemId}')">
       <div class="card-header">
@@ -394,6 +399,7 @@ function renderOutHistory() {
       </div>
       <div class="info-row"><span class="label">出库日期</span><span class="value">${esc(r.date)}</span></div>
       <div class="info-row"><span class="label">领用人</span><span class="value">${esc(r.receiver) || '-'}</span></div>
+      <div class="info-row"><span class="label">出库后剩余</span><span class="value" style="color:#52c41a">${stockAfter} ${esc(rec.unit||'件')}</span></div>
       <div class="info-row"><span class="label">领用原因</span><span class="value">${esc(r.reason) || '-'}</span></div>
       ${r.remark ? '<div class="info-row"><span class="label">备注</span><span class="value">'+esc(r.remark)+'</span></div>' : ''}
     </div>`;
@@ -726,7 +732,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   // 表头：基本信息 + 出库历史
   const header = ['货物名称','规格','入库数量','单位','当前库存','入库日期','采购人','采购理由','金额','币种','卖方公司','入库备注','状态'];
   // 每条出库记录的列
-  const outHeader = ['出库日期','领用人','领用原因','出库数量','出库金额','出库备注'];
+  const outHeader = ['出库日期','领用人','领用原因','出库数量','出库金额','出库后剩余','出库备注'];
   const allHeader = [...header, ...outHeader];
   
   const rows = [];
@@ -741,13 +747,16 @@ document.getElementById('exportBtn').addEventListener('click', () => {
     ];
     if (hist.length === 0) {
       // 无出库记录，只导出一行
-      rows.push([...base, '', '', '', '', '', '']);
+      rows.push([...base, '', '', '', '', '', '', '']);
     } else {
       // 每条出库记录一行，每行都显示完整物品信息
+      let totalBefore = 0;
       hist.forEach(h => {
         const unitVal = (parseFloat(r.amount) || 0) / (parseFloat(r.quantity) || 1);
         const outVal = (unitVal * parseFloat(h.quantity || 0)).toFixed(2);
-        rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, outVal, h.remark||'']);
+        const stockAfter = (parseFloat(r.quantity) || 0) - totalBefore - (parseFloat(h.quantity) || 0);
+        rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, outVal, stockAfter, h.remark||'']);
+        totalBefore += parseFloat(h.quantity) || 0;
       });
     }
   });
