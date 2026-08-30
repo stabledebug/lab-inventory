@@ -1,18 +1,1 @@
-[
-  {
-    "id": "1788086035212",
-    "name": "基片",
-    "spec": "20",
-    "quantity": "1",
-    "unit": "件",
-    "amount": "1",
-    "currency": "CNY",
-    "inDate": "2026-08-30",
-    "purchaser": "1",
-    "reason": "课题组实验用",
-    "seller": "北京",
-    "remark": "",
-    "outHistory": [],
-    "createdAt": "2026-08-30T10:33:55.212Z"
-  }
-]
+[]
