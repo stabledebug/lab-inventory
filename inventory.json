@@ -19,6 +19,15 @@
     "outPrice": "200",
     "outCurrency": "CNY",
     "outRemark": "",
-    "createdAt": "2026-08-30T10:24:47.620Z"
+    "createdAt": "2026-08-30T10:24:47.620Z",
+    "outHistory": [
+      {
+        "date": "2026-08-30",
+        "receiver": "马怀冲",
+        "reason": "实验室耗材",
+        "quantity": 2,
+        "remark": ""
+      }
+    ]
   }
 ]
