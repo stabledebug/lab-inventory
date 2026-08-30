@@ -99,70 +99,74 @@
   }
   .submit-btn:active { opacity: 0.85; }
 
-  .overview-row { display: flex; padding: 16px 16px 8px; gap: 12px; }
-  .stat-card { flex: 1; border-radius: 12px; padding: 16px 8px 14px; text-align: center; box-shadow: 0 1px 10px rgba(0,0,0,0.08); }
-  .stat-card.blue { background: var(--blue); }
-  .stat-card.green { background: var(--green); }
-  .stat-card.orange { background: var(--orange); }
-  .stat-num { display: block; font-size: 26px; font-weight: 700; color: #fff; line-height: 1; margin-bottom: 6px; }
-  .stat-lbl { display: block; font-size: 11px; color: rgba(255,255,255,0.85); }
+  .stat-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 12px 16px; }
+  .stat-card { background: var(--card); border-radius: 12px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .stat-num { font-size: 28px; font-weight: 700; color: var(--blue); }
+  .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .stat-card.green .stat-num { color: var(--green); }
+  .stat-card.orange .stat-num { color: var(--orange); }
 
-  .amount-row { display: flex; align-items: center; padding: 14px 16px; }
-  .amount-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
-  .amount-divider { width: 1px; height: 44px; background: var(--border); }
-  .amount-lbl { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
-  .amount-cny { font-size: 18px; font-weight: 700; color: var(--blue); line-height: 1.2; }
-  .amount-usd { font-size: 13px; color: var(--orange); margin-top: 2px; }
+  .chart-section { margin: 12px 16px; background: var(--card); border-radius: 12px; padding: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .chart-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+  .trend-chart { display: flex; align-items: flex-end; justify-content: space-between; height: 120px; padding-top: 20px; }
+  .trend-col { flex: 1; display: flex; flex-direction: column; align-items: center; }
+  .trend-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 100%; }
+  .trend-count { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .trend-bar { width: 20px; background: linear-gradient(180deg, var(--blue) 0%, #69c0ff 100%); border-radius: 4px 4px 0 0; min-height: 4px; }
+  .trend-label { font-size: 12px; color: var(--muted); margin-top: 8px; }
 
-  .trend-chart { display: flex; align-items: flex-end; justify-content: space-around; padding: 16px 12px 8px; height: 140px; }
-  .trend-col { display: flex; flex-direction: column; align-items: center; flex: 1; height: 100%; justify-content: flex-end; }
-  .trend-bar-wrap { display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
-  .trend-bar { width: 24px; background: var(--blue); border-radius: 3px 3px 0 0; min-height: 3px; transition: height .3s; }
-  .trend-count { font-size: 11px; color: var(--blue); font-weight: 600; margin-bottom: 4px; }
-  .trend-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
-
-  .recent-item { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid #f9f9f9; }
+  .recent-list { margin: 12px 16px; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 6px rgba(0,0,0,0.05); }
+  .recent-item { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid var(--border); cursor: pointer; }
   .recent-item:last-child { border-bottom: none; }
-  .recent-name { font-size: 14px; color: var(--text); font-weight: 500; display: block; margin-bottom: 4px; word-break: break-all; }
-  .recent-date { font-size: 11px; color: var(--muted); }
-  .dot { width: 8px; height: 8px; border-radius: 50%; margin-left: 12px; flex-shrink: 0; }
-  .dot.in { background: var(--green); }
-  .dot.out { background: #ddd; }
+  .recent-name { font-size: 14px; font-weight: 500; }
+  .recent-date { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .dot.in { background: var(--blue); }
+  .dot.out { background: var(--muted); }
 
-  .export-tip { font-size: 12px; color: var(--muted); padding: 14px 16px 8px; line-height: 1.6; }
-  .export-btn { margin: 0 16px 16px; background: var(--blue); color: #fff; border: none; border-radius: 22px; height: 44px; font-size: 15px; font-weight: 600; width: calc(100% - 32px); cursor: pointer; }
-  .export-btn:active { opacity: 0.85; }
-
-  nav {
-    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-    width: 100%; max-width: 500px; height: 56px; background: #fff;
-    display: flex; border-top: 1px solid var(--border); z-index: 20;
+  .nav-bar {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 500px;
+    background: var(--card); display: flex; border-top: 1px solid var(--border); z-index: 10;
   }
-  .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; color: var(--muted); font-size: 11px; }
+  .nav-item { flex: 1; text-align: center; padding: 10px 0; cursor: pointer; color: var(--muted); }
   .nav-item.active { color: var(--blue); }
-  .nav-icon { font-size: 22px; margin-bottom: 2px; }
+  .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 2px; }
+  .nav-item span { font-size: 11px; display: block; }
 
-  .mask { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 50; display: none; align-items: flex-end; justify-content: center; }
-  .mask.show { display: flex; }
-  .sheet {
-    background: #fff; width: 100%; max-width: 500px; border-radius: 16px 16px 0 0;
-    max-height: 88vh; overflow-y: auto; padding-bottom: 24px; animation: up .25s ease;
+  #mask { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 99; display: none; }
+  #mask.show { display: flex; justify-content: center; align-items: flex-end; }
+  #sheet {
+    background: var(--card); width: 100%; max-width: 500px; max-height: 85vh;
+    border-radius: 16px 16px 0 0; overflow: hidden; display: flex; flex-direction: column;
   }
-  @keyframes up { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  .sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; background: #fff; z-index: 1; }
+  .sheet-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; border-bottom: 1px solid var(--border); }
   .sheet-title { font-size: 16px; font-weight: 600; }
   .sheet-close { font-size: 24px; color: var(--muted); cursor: pointer; line-height: 1; }
-  .sheet-body { padding: 6px 16px; }
-  .sheet-actions { display: flex; gap: 12px; padding: 12px 16px 0; }
-  .btn { flex: 1; height: 44px; border-radius: 22px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; }
+  .sheet-body { flex: 1; overflow-y: auto; padding: 12px 16px; }
+  .sheet-actions { display: flex; gap: 12px; padding: 12px 16px; border-top: 1px solid var(--border); }
+  .btn { flex: 1; height: 44px; border-radius: 22px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; }
   .btn.primary { background: var(--blue); color: #fff; }
-  .btn.danger { background: #fff2f0; color: var(--red); border: 1px solid #ffccc7; }
-  .btn.plain { background: #f5f5f5; color: #666; }
-  .btn:active { opacity: 0.85; }
+  .btn.plain { background: var(--bg); color: var(--text); }
+  .btn.danger { background: #fff1f0; color: var(--red); border: 1px solid #ffa39e; }
 
-  @media (min-width: 540px) {
-    .record-name { font-size: 17px; }
-    .stat-num { font-size: 28px; }
+  .token-modal {
+    position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 999;
+    display: flex; justify-content: center; align-items: center; padding: 20px;
+  }
+  .token-box {
+    background: var(--card); border-radius: 16px; padding: 24px; max-width: 360px; width: 100%;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+  .token-title { font-size: 18px; font-weight: 600; text-align: center; margin-bottom: 16px; }
+  .token-input {
+    width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 12px;
+    font-size: 14px; margin-bottom: 12px; outline: none;
+  }
+  .token-input:focus { border-color: var(--blue); }
+  .token-hint { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+  .token-btn {
+    width: 100%; background: var(--blue); color: #fff; border: none; border-radius: 22px;
+    height: 44px; font-size: 15px; font-weight: 600; cursor: pointer;
   }
 </style>
 </head>
@@ -170,300 +174,168 @@
 <div id="app">
   <header>课题组耗材管理</header>
   <main>
-    <!-- 记录 -->
-    <section class="view active" id="view-records">
-      <div class="search-bar">
-        <input class="search-input" id="searchInput" placeholder="搜索货物名称 / 采购人 / 卖方公司">
-      </div>
+    <div id="view-records" class="view active">
+      <div class="search-bar"><input class="search-input" id="searchInput" placeholder="搜索货物名称、采购人、领用人..."></div>
       <div class="filter-tabs">
         <div class="tab active" data-filter="all">全部</div>
-        <div class="tab" data-filter="in_stock">库存中</div>
-        <div class="tab" data-filter="out_stock">已出库</div>
+        <div class="tab" data-filter="in">库存中</div>
+        <div class="tab" data-filter="out">已出库</div>
       </div>
       <div class="record-list" id="recordList"></div>
-    </section>
+    </div>
 
-    <!-- 入库 -->
-    <section class="view" id="view-add">
+    <div id="view-add" class="view">
       <form id="addForm">
         <div class="form-section">
-          <div class="field">
-            <div class="field-label required">采购货物名称</div>
-            <input class="field-input" id="f-name" placeholder="如：移液枪枪头">
-          </div>
-          <div class="field">
-            <div class="field-label required">规格</div>
-            <input class="field-input" id="f-spec" placeholder="如：10mL/支、500g/瓶">
-          </div>
+          <div class="field"><div class="field-label required">采购货物名称</div><input class="field-input" id="f-name" placeholder="如：移液枪吸头"></div>
+          <div class="field"><div class="field-label required">规格</div><input class="field-input" id="f-spec" placeholder="如：10μL, 灭菌"></div>
           <div class="row2">
-            <div class="field">
-              <div class="field-label required">数量</div>
-              <input class="field-input" id="f-quantity" type="number" inputmode="decimal" placeholder="数量">
-            </div>
-            <div class="field">
-              <div class="field-label">单位</div>
+            <div class="field"><div class="field-label required">数量</div><input class="field-input" id="f-quantity" type="number" inputmode="decimal" placeholder="0"></div>
+            <div class="field"><div class="field-label">单位</div>
               <select class="field-select" id="f-unit">
-                <option>件</option><option>盒</option><option>瓶</option><option>支</option><option>个</option>
-                <option>包</option><option>箱</option><option>卷</option><option>袋</option><option>张</option>
-                <option>米</option><option>kg</option><option>g</option><option>L</option><option>mL</option>
+                <option>件</option><option>盒</option><option>包</option><option>瓶</option><option>套</option><option>个</option><option>支</option><option>袋</option>
               </select>
             </div>
           </div>
           <div class="row2">
-            <div class="field">
-              <div class="field-label required">金额</div>
-              <input class="field-input" id="f-amount" type="number" inputmode="decimal" placeholder="0.00">
-            </div>
-            <div class="field">
-              <div class="field-label required">币种</div>
+            <div class="field"><div class="field-label required">金额</div><input class="field-input" id="f-amount" type="number" inputmode="decimal" placeholder="0.00"></div>
+            <div class="field"><div class="field-label required">币种</div>
               <select class="field-select" id="f-currency">
                 <option value="CNY">人民币 ¥</option>
                 <option value="USD">美元 $</option>
               </select>
             </div>
           </div>
+          <div class="field"><div class="field-label required">入库日期</div><input class="field-input" id="f-inDate" type="date"></div>
+          <div class="field"><div class="field-label required">采购人</div><input class="field-input" id="f-purchaser" placeholder="采购人姓名"></div>
+          <div class="field"><div class="field-label required">采购理由</div><input class="field-input" id="f-reason" placeholder="如：某某课题实验使用"></div>
+          <div class="field"><div class="field-label required">卖方公司名称</div><input class="field-input" id="f-seller" placeholder="卖方公司全称"></div>
+          <div class="field"><div class="field-label">备注</div><textarea class="field-textarea" id="f-remark" placeholder="选填"></textarea></div>
         </div>
-        <div class="form-section">
-          <div class="field">
-            <div class="field-label required">入库日期</div>
-            <input class="field-input" id="f-inDate" type="date">
-          </div>
-          <div class="field">
-            <div class="field-label required">采购人</div>
-            <input class="field-input" id="f-purchaser" placeholder="采购人姓名">
-          </div>
-          <div class="field">
-            <div class="field-label required">采购理由</div>
-            <input class="field-input" id="f-reason" placeholder="如：PCR 实验耗材补充">
-          </div>
-          <div class="field">
-            <div class="field-label required">卖方公司名称</div>
-            <input class="field-input" id="f-seller" placeholder="如：某某生物科技有限公司">
-          </div>
-          <div class="field">
-            <div class="field-label">备注</div>
-            <textarea class="field-textarea" id="f-remark" placeholder="其他备注（选填）"></textarea>
-          </div>
-        </div>
-        <button type="submit" class="submit-btn">确认入库</button>
+        <button class="submit-btn" type="submit">确认入库</button>
       </form>
-    </section>
+    </div>
 
-    <!-- 统计 -->
-    <section class="view" id="view-stats">
-      <div class="overview-row">
-        <div class="stat-card blue"><span class="stat-num" id="s-total">0</span><span class="stat-lbl">总记录</span></div>
-        <div class="stat-card green"><span class="stat-num" id="s-in">0</span><span class="stat-lbl">库存中</span></div>
-        <div class="stat-card orange"><span class="stat-num" id="s-out">0</span><span class="stat-lbl">已出库</span></div>
+    <div id="view-stats" class="view">
+      <div class="stat-cards">
+        <div class="stat-card"><div class="stat-num" id="s-total">0</div><div class="stat-label">总记录</div></div>
+        <div class="stat-card green"><div class="stat-num" id="s-in">0</div><div class="stat-label">库存中</div></div>
+        <div class="stat-card orange"><div class="stat-num" id="s-out">0</div><div class="stat-label">已出库</div></div>
+        <div class="stat-card"><div class="stat-num" id="s-monthIn">0</div><div class="stat-label" id="s-month-title">本月入库</div></div>
       </div>
       <div class="section">
-        <div class="section-title">金额统计</div>
-        <div class="amount-row">
-          <div class="amount-col">
-            <span class="amount-lbl">库存金额</span>
-            <span class="amount-cny" id="s-stockCny">¥0.00</span>
-            <span class="amount-usd" id="s-stockUsd">$0.00</span>
-          </div>
-          <div class="amount-divider"></div>
-          <div class="amount-col">
-            <span class="amount-lbl">累计入库金额</span>
-            <span class="amount-cny" id="s-inCny">¥0.00</span>
-            <span class="amount-usd" id="s-inUsd">$0.00</span>
-          </div>
+        <div class="section-title">库存金额</div>
+        <div style="padding:16px">
+          <div class="info-row"><span class="label">库存金额(¥)</span><span class="value price" id="s-stockCny">¥0.00</span></div>
+          <div class="info-row"><span class="label">库存金额($)</span><span class="value price" id="s-stockUsd">$0.00</span></div>
+          <div class="info-row"><span class="label">累计入库(¥)</span><span class="value" id="s-inCny">¥0.00</span></div>
+          <div class="info-row"><span class="label">累计入库($)</span><span class="value" id="s-inUsd">$0.00</span></div>
         </div>
       </div>
-      <div class="section">
-        <div class="section-title" id="s-month-title">本月统计</div>
-        <div class="amount-row">
-          <div class="amount-col">
-            <span class="amount-lbl">本月入库</span>
-            <span class="stat-num" style="color:var(--blue);font-size:22px" id="s-monthIn">0</span>
-          </div>
-          <div class="amount-divider"></div>
-          <div class="amount-col">
-            <span class="amount-lbl">本月出库</span>
-            <span class="stat-num" style="color:var(--orange);font-size:22px" id="s-monthOut">0</span>
-          </div>
-        </div>
-      </div>
-      <div class="section">
-        <div class="section-title">近6月入库趋势</div>
+      <div class="chart-section">
+        <div class="chart-title">近 6 个月入库趋势</div>
         <div class="trend-chart" id="trendChart"></div>
       </div>
       <div class="section">
         <div class="section-title">最近入库</div>
-        <div id="recentList"></div>
+        <div class="recent-list" id="recentList" style="margin:0;border-radius:0;box-shadow:none"></div>
       </div>
       <div class="section">
-        <div class="section-title">数据导入导出</div>
-        <div class="export-tip">导出 CSV 可在 Excel / WPS 打开编辑；导入同样格式的 CSV 可批量恢复或合并数据。数据已保存在 GitHub 仓库云端，课题组共享同一份。</div>
-        <div style="display:flex; gap:12px; padding:0 16px 16px;">
-          <button class="export-btn" id="exportBtn" style="margin:0;flex:1">导出表格</button>
-          <button class="export-btn" id="importBtn" style="margin:0;flex:1;background:#fff;color:var(--blue);border:1px solid var(--blue)">导入表格</button>
+        <div class="section-title">数据操作</div>
+        <div style="padding:16px">
+          <button class="btn primary" style="width:100%;margin-bottom:12px" id="exportBtn">导出表格到剪贴板</button>
+          <button class="btn plain" style="width:100%;margin-bottom:12px" id="importBtn">导入 CSV 文件</button>
+          <input type="file" id="importFile" accept=".csv,.txt" style="display:none">
+          <button class="btn plain" style="width:100%" id="tokenBtn">更换 Token</button>
         </div>
-        <div style="padding:0 16px 16px;">
-          <button class="export-btn" id="tokenBtn" style="margin:0;width:100%;background:#fff;color:var(--muted);border:1px solid #ddd">更改访问密码</button>
-        </div>
-        <input type="file" id="importFile" accept=".csv" style="display:none">
       </div>
-    </section>
+    </div>
   </main>
 
-  <nav>
-    <div class="nav-item active" data-view="records"><span class="nav-icon">📋</span>记录</div>
-    <div class="nav-item" data-view="add"><span class="nav-icon">➕</span>入库</div>
-    <div class="nav-item" data-view="stats"><span class="nav-icon">📊</span>统计</div>
-  </nav>
+  <div class="nav-bar">
+    <div class="nav-item active" data-view="records">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14z"/><path d="M7 12h2v5H7zm4-3h2v8h-2zm4-3h2v11h-2z"/></svg>
+      <span>记录</span>
+    </div>
+    <div class="nav-item" data-view="add">
+      <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+      <span>入库</span>
+    </div>
+    <div class="nav-item" data-view="stats">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+      <span>统计</span>
+    </div>
+  </div>
+</div>
 
-  <div class="mask" id="mask">
-    <div class="sheet" id="sheet"></div>
+<div id="mask"><div id="sheet"></div></div>
+<div id="tokenModal" class="token-modal" style="display:none">
+  <div class="token-box">
+    <div class="token-title">首次使用需设置 Token</div>
+    <input class="token-input" id="tokenInput" type="password" placeholder="粘贴 GitHub Token">
+    <div class="token-hint">
+      Token 用于云端同步数据，仅存储在本机浏览器。<br>
+      需要 GitHub Fine-grained Token，权限：Contents (Read and Write)。
+    </div>
+    <button class="token-btn" id="tokenSubmit">确认</button>
   </div>
 </div>
 
 <script>
-/* ===== 云端同步（方案 C：Vercel 中转）=====
-   数据经 Vercel 函数代理读写 GitHub 仓库 inventory.json，课题组共享同一份。
-   GitHub token 藏在 Vercel 后端环境变量，前端只用共享访问密码（存本机浏览器）。 */
-const API_BASE = '/api/inventory';
-
+const GH_REPO = 'stabledebug/lab-inventory';
+const GH_FILE = 'inventory.json';
+const UNITS = ['件','盒','包','瓶','套','个','支','袋'];
 let DB = [];
+let SHA = '';
 
-function getPwd() { return localStorage.getItem('lab_pwd') || ''; }
-function ensurePwd() {
-  const p = getPwd();
-  if (p) return Promise.resolve(p);
-  return new Promise(resolve => {
-    const sheet = document.getElementById('sheet');
-    sheet.innerHTML = `<div class="sheet-head"><span class="sheet-title">输入访问密码</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
-      <div class="sheet-body" style="padding:16px">
-        <p style="font-size:13px;color:#666;line-height:1.6;margin-bottom:12px">请输入课题组共享的访问密码，即可读取 / 写入库存数据。密码只存在本机浏览器，不会上传。</p>
-        <input class="field-input" id="pwdInput" type="password" placeholder="输入访问密码" style="margin-bottom:16px">
-        <button class="btn primary" id="pwdSave">保存并使用</button>
-      </div>`;
-    document.getElementById('mask').classList.add('show');
-    document.getElementById('pwdSave').onclick = () => {
-      const v = document.getElementById('pwdInput').value;
-      if (!v) { toast('请输入密码'); return; }
-      localStorage.setItem('lab_pwd', v);
-      document.getElementById('mask').classList.remove('show');
-      resolve(v);
-    };
-  });
-}
+function today() { return new Date().toISOString().split('T')[0]; }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtPrice(n, cur) { const p = parseFloat(n); if (isNaN(p)) return '-'; return cur === 'USD' ? '$' + p.toFixed(2) : '¥' + p.toFixed(2); }
 
-async function apiGet() {
-  const pwd = await ensurePwd();
-  const r = await fetch(API_BASE, { headers: { 'x-password': pwd } });
-  if (r.status === 404) return { sha: null, data: [] };
-  if (r.status === 401) throw new Error('密码错误');
-  if (!r.ok) throw new Error('读取失败 ' + r.status);
-  const j = await r.json();
-  const txt = decodeURIComponent(escape(atob(j.content.replace(/\s/g, ''))));
-  return { sha: j.sha, data: JSON.parse(txt) };
-}
-async function apiPut(data, sha) {
-  const pwd = await ensurePwd();
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
-  const body = { content };
-  if (sha) body.sha = sha;
-  return fetch(API_BASE, {
-    method: 'PUT',
-    headers: { 'x-password': pwd, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-}
-function mergeArrays(remote, local) {
-  const m = new Map();
-  (remote || []).forEach(r => m.set(r.id, r));
-  (local || []).forEach(r => m.set(r.id, r));
-  return Array.from(m.values());
-}
-async function ensureFresh() {
-  try {
-    const { data } = await apiGet();
-    DB = Array.isArray(data) ? data : [];
-    try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
-  } catch (e) { /* 保留内存中的数据 */ }
-}
-async function push() {
-  for (let i = 0; i < 6; i++) {
-    const { sha, data: remote } = await apiGet();
-    const merged = mergeArrays(remote, DB);
-    const res = await apiPut(merged, sha);
-    if (res.ok) {
-      DB = merged;
-      try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
-      return;
-    }
-    if (res.status === 409) continue; // 别人刚改了，拉最新重试
-    throw new Error('保存失败(' + res.status + ')');
-  }
-  throw new Error('并发冲突，请稍后重试');
-}
-
-const UNITS = ['件','盒','瓶','支','个','包','箱','卷','袋','张','米','kg','g','L','mL'];
-function today() {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function sym(c) { return c === 'USD' ? '$' : '¥'; }
-function fmtPrice(p, c) {
-  if (p === '' || p === undefined || p === null || isNaN(parseFloat(p))) return '-';
-  return sym(c) + parseFloat(p).toFixed(2);
-}
-function esc(s) {
-  return String(s === undefined ? '' : s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
-
-let state = { search: '', filter: 'all' };
-
-async function showView(name) {
+function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === name));
-  if (name === 'records') { await ensureFresh(); renderRecords(); }
-  if (name === 'stats') { await ensureFresh(); renderStats(); }
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector('.nav-item[data-view="' + name + '"]').classList.add('active');
+  if (name === 'stats') renderStats();
 }
 document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => showView(n.dataset.view)));
+
+let currentFilter = 'all';
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   t.classList.add('active');
-  state.filter = t.dataset.filter;
+  currentFilter = t.dataset.filter;
   renderRecords();
 }));
-document.getElementById('searchInput').addEventListener('input', e => { state.search = e.target.value.trim().toLowerCase(); renderRecords(); });
 
-function getFiltered() {
-  let list = DB;
-  if (state.search) {
-    list = list.filter(r =>
-      (r.name||'').toLowerCase().includes(state.search) ||
-      (r.purchaser||'').toLowerCase().includes(state.search) ||
-      (r.seller||'').toLowerCase().includes(state.search));
-  }
-  if (state.filter === 'in_stock') list = list.filter(r => !r.outDate);
-  else if (state.filter === 'out_stock') list = list.filter(r => !!r.outDate);
-  list = list.slice().sort((a,b) => new Date(b.inDate) - new Date(a.inDate));
-  return list;
+document.getElementById('searchInput').addEventListener('input', renderRecords);
+
+function getFilteredList() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  return DB.filter(r => {
+    const matchSearch = !q || [r.name, r.purchaser, r.outReceiver, r.seller].some(s => (s||'').toLowerCase().includes(q));
+    const matchFilter = currentFilter === 'all' || (currentFilter === 'in' && !r.outDate) || (currentFilter === 'out' && r.outDate);
+    return matchSearch && matchFilter;
+  });
 }
+
 function renderRecords() {
-  const list = getFiltered();
-  const box = document.getElementById('recordList');
+  const list = getFilteredList();
+  const el = document.getElementById('recordList');
   if (!list.length) {
-    box.innerHTML = `<div class="empty"><span class="icon">📦</span>暂无记录<br>去「入库」添加第一条吧</div>`;
+    el.innerHTML = '<div class="empty"><span class="icon">📭</span>暂无记录</div>';
     return;
   }
-  box.innerHTML = list.map(r => `
+  el.innerHTML = list.map(r => `
     <div class="record-card" onclick="openDetail('${r.id}')">
       <div class="card-header">
-        <span class="record-name">${esc(r.name)}</span>
+        <div class="record-name">${esc(r.name)}</div>
         <span class="badge ${r.outDate ? 'out' : 'in'}">${r.outDate ? '已出库' : '库存中'}</span>
       </div>
       <div class="info-row"><span class="label">入库日期</span><span class="value">${esc(r.inDate)}</span></div>
       <div class="info-row"><span class="label">采购人</span><span class="value">${esc(r.purchaser) || '-'}</span></div>
-      <div class="info-row"><span class="label">卖方公司</span><span class="value">${esc(r.seller) || '-'}</span></div>
-      ${r.quantity ? `<div class="info-row"><span class="label">数量</span><span class="value">${esc(r.quantity)} ${esc(r.unit||'件')}</span></div>` : ''}
-      ${r.spec ? `<div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec)}</span></div>` : ''}
+      <div class="info-row"><span class="label">数量/规格</span><span class="value">${esc(r.quantity)} ${esc(r.unit||'件')} / ${esc(r.spec) || '-'}</span></div>
       <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
     </div>`).join('');
 }
@@ -473,30 +345,23 @@ function openDetail(id) {
   if (!r) return;
   const sheet = document.getElementById('sheet');
   sheet.innerHTML = `
-    <div class="sheet-head">
-      <span class="sheet-title">${esc(r.name)}</span>
-      <span class="sheet-close" onclick="closeSheet()">×</span>
-    </div>
+    <div class="sheet-head"><span class="sheet-title">${esc(r.name)}</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
     <div class="sheet-body">
       <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
-        <div class="section-title">基本信息</div>
-        <div class="info-row"><span class="label">货物名称</span><span class="value">${esc(r.name)}</span></div>
-        ${r.spec ? `<div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec)}</span></div>` : ''}
-        ${r.quantity ? `<div class="info-row"><span class="label">数量</span><span class="value">${esc(r.quantity)} ${esc(r.unit||'件')}</span></div>` : ''}
-        <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
-      </div>
-      <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="section-title">入库信息</div>
+        <div class="info-row"><span class="label">规格</span><span class="value">${esc(r.spec) || '-'}</span></div>
+        <div class="info-row"><span class="label">数量</span><span class="value">${esc(r.quantity)} ${esc(r.unit||'件')}</span></div>
         <div class="info-row"><span class="label">入库日期</span><span class="value">${esc(r.inDate)}</span></div>
         <div class="info-row"><span class="label">采购人</span><span class="value">${esc(r.purchaser) || '-'}</span></div>
         <div class="info-row"><span class="label">采购理由</span><span class="value">${esc(r.reason) || '-'}</span></div>
+        <div class="info-row"><span class="label">金额</span><span class="value price">${fmtPrice(r.amount, r.currency)}</span></div>
         <div class="info-row"><span class="label">卖方公司</span><span class="value">${esc(r.seller) || '-'}</span></div>
-        ${r.remark ? `<div class="info-row"><span class="label">备注</span><span class="value">${esc(r.remark)}</span></div>` : ''}
+        <div class="info-row"><span class="label">备注</span><span class="value">${esc(r.remark) || '-'}</span></div>
       </div>
       ${r.outDate ? `
       <div class="section" style="margin:12px 0;box-shadow:none;border:1px solid var(--border)">
         <div class="section-title red">出库信息</div>
-        <div class="info-row"><span class="label">出库日期</span><span class="value danger">${esc(r.outDate)}</span></div>
+        <div class="info-row"><span class="label">出库日期</span><span class="value">${esc(r.outDate)}</span></div>
         <div class="info-row"><span class="label">领用人</span><span class="value">${esc(r.outReceiver) || '-'}</span></div>
         <div class="info-row"><span class="label">领用原因</span><span class="value">${esc(r.outReason) || '-'}</span></div>
         <div class="info-row"><span class="label">领用数量</span><span class="value">${esc(r.outQuantity)} ${esc(r.unit||'件')}</span></div>
@@ -696,7 +561,6 @@ function renderStats() {
   document.getElementById('s-inUsd').textContent = '$' + inUsd.toFixed(2);
   document.getElementById('s-month-title').textContent = m + '月统计';
   document.getElementById('s-monthIn').textContent = monthIn;
-  document.getElementById('s-monthOut').textContent = monthOut;
 
   const trend = [];
   for (let i = 5; i >= 0; i--) {
@@ -738,19 +602,13 @@ document.getElementById('exportBtn').addEventListener('click', () => {
     const s = String(c);
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
   }).join(',')).join('\n');
-  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `课题组耗材_${today()}.csv`;
-  a.click();
-  URL.revokeObjectURL(a.href);
-  toast('已导出 CSV 文件');
+  navigator.clipboard.writeText('\ufeff' + csv).then(() => toast('CSV 已复制到剪贴板')).catch(() => toast('复制失败'));
 });
 
 document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
 document.getElementById('tokenBtn').addEventListener('click', () => {
-  localStorage.removeItem('lab_pwd');
-  ensurePwd().then(() => { toast('密码已更新'); showView('records'); });
+  localStorage.removeItem('lab_token');
+  ensureToken().then(() => { toast('Token 已更新'); showView('records'); });
 });
 document.getElementById('importFile').addEventListener('change', async e => {
   const file = e.target.files && e.target.files[0];
@@ -837,16 +695,91 @@ function toast(msg) {
   toastTimer = setTimeout(() => t.style.opacity = '0', 1500);
 }
 
-document.getElementById('f-inDate').value = today();
-(async function init() {
+// Token 管理
+function ensureToken() {
+  return new Promise(resolve => {
+    let token = localStorage.getItem('lab_token');
+    if (token) { resolve(token); return; }
+    const modal = document.getElementById('tokenModal');
+    const input = document.getElementById('tokenInput');
+    const btn = document.getElementById('tokenSubmit');
+    modal.style.display = 'flex';
+    input.value = '';
+    input.focus();
+    const done = () => {
+      const t = input.value.trim();
+      if (!t) { toast('请输入 Token'); return; }
+      localStorage.setItem('lab_token', t);
+      modal.style.display = 'none';
+      resolve(t);
+    };
+    btn.onclick = done;
+    input.onkeydown = e => { if (e.key === 'Enter') done(); };
+  });
+}
+
+// GitHub API 调用
+async function githubApi(method, path, body) {
+  const token = await ensureToken();
+  const url = 'https://api.github.com' + path;
+  const headers = {
+    Authorization: 'Bearer ' + token,
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'lab-inventory',
+  };
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error('GitHub API 错误: ' + res.status + ' ' + text);
+  }
+  return res.json();
+}
+
+async function pull() {
   try {
-    const { data } = await apiGet();
-    DB = Array.isArray(data) ? data : [];
+    const data = await githubApi('GET', `/repos/${GH_REPO}/contents/${GH_FILE}`);
+    SHA = data.sha;
+    const content = atob(data.content);
+    DB = JSON.parse(content);
+    if (!Array.isArray(DB)) DB = [];
     try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
   } catch (e) {
-    try { DB = JSON.parse(localStorage.getItem('lab_cache') || '[]'); } catch (e) { DB = []; }
-    toast('云端加载失败，显示本地缓存');
+    if (e.message && e.message.includes('404')) {
+      DB = [];
+      SHA = '';
+    } else {
+      try { DB = JSON.parse(localStorage.getItem('lab_cache') || '[]'); } catch (e) { DB = []; }
+      toast('云端加载失败，显示本地缓存');
+    }
   }
+}
+
+async function push() {
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(DB, null, 2))));
+  const body = {
+    message: 'update ' + new Date().toISOString(),
+    content: content,
+  };
+  if (SHA) body.sha = SHA;
+  const result = await githubApi('PUT', `/repos/${GH_REPO}/contents/${GH_FILE}`, body);
+  SHA = result.content.sha;
+  try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
+}
+
+async function ensureFresh() {
+  try {
+    await pull();
+  } catch (e) {
+    // 使用本地缓存
+  }
+}
+
+document.getElementById('f-inDate').value = today();
+(async function init() {
+  await ensureToken();
+  await pull();
   renderRecords();
 })();
 </script>
