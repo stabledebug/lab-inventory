@@ -20,27 +20,5 @@
     "outCurrency": "CNY",
     "outRemark": "",
     "createdAt": "2026-08-30T09:00:05.704Z"
-  },
-  {
-    "id": "1788079386752",
-    "name": "枪头",
-    "spec": "10ml",
-    "quantity": "4",
-    "unit": "件",
-    "amount": "7",
-    "currency": "CNY",
-    "inDate": "2026-08-30",
-    "purchaser": "huaichong",
-    "reason": "实验室测试",
-    "seller": "三星中国研究院",
-    "remark": "",
-    "outDate": "",
-    "outReceiver": "",
-    "outReason": "",
-    "outQuantity": "",
-    "outPrice": "",
-    "outCurrency": "CNY",
-    "outRemark": "",
-    "createdAt": "2026-08-30T08:43:06.752Z"
   }
 ]
