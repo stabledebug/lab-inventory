@@ -709,18 +709,37 @@ function renderStats() {
 
 document.getElementById('exportBtn').addEventListener('click', () => {
   if (!DB.length) { toast('暂无数据可导出'); return; }
-  const header = ['货物名称','规格','入库数量','单位','当前库存','入库日期','采购人','采购理由','金额','币种','卖方公司','入库备注','累计出库次数','累计出库数量','状态'];
-  const rows = DB.map(r => {
+  // 表头：基本信息 + 出库历史
+  const header = ['货物名称','规格','入库数量','单位','当前库存','入库日期','采购人','采购理由','金额','币种','卖方公司','入库备注','状态'];
+  // 每条出库记录的列
+  const outHeader = ['出库日期','领用人','领用原因','出库数量','出库备注'];
+  const allHeader = [...header, ...outHeader];
+  
+  const rows = [];
+  DB.forEach(r => {
     const hist = r.outHistory || [];
-    const totalOut = hist.reduce((sum, h) => sum + (parseFloat(h.quantity) || 0), 0);
+    const totalOut = calcTotalOut(r);
     const stock = (parseFloat(r.quantity) || 0) - totalOut;
-    return [
+    const base = [
       r.name, r.spec||'', r.quantity||'', r.unit||'', stock, r.inDate, r.purchaser||'', r.reason||'',
       r.amount||'', r.currency==='USD'?'美元':'人民币', r.seller||'', r.remark||'',
-      hist.length, totalOut, stock <= 0 ? '已用完' : '库存中'
+      stock <= 0 ? '已用完' : '库存中'
     ];
+    if (hist.length === 0) {
+      // 无出库记录，只导出一行
+      rows.push([...base, '', '', '', '', '']);
+    } else {
+      // 每条出库记录一行
+      hist.forEach((h, i) => {
+        if (i === 0) {
+          rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
+        } else {
+          rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', ...outHeader.map(() => ''), h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
+        }
+      });
+    }
   });
-  const csv = [header, ...rows].map(row => row.map(c => {
+  const csv = [allHeader, ...rows].map(row => row.map(c => {
     const s = String(c);
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
   }).join(',')).join('\n');
