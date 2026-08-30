@@ -734,7 +734,7 @@ document.getElementById('exportBtn').addEventListener('click', () => {
         if (i === 0) {
           rows.push([...base, h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
         } else {
-          rows.push(['', '', '', '', '', '', '', '', '', '', '', '', '', ...outHeader.map(() => ''), h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
+          rows.push(['', '', '', '', '', '', '', '', '', '', '', '', h.date||'', h.receiver||'', h.reason||'', h.quantity||0, h.remark||'']);
         }
       });
     }
