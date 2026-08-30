@@ -741,7 +741,7 @@ async function pull() {
   try {
     const data = await githubApi('GET', `/repos/${GH_REPO}/contents/${GH_FILE}`);
     SHA = data.sha;
-    const content = atob(data.content);
+    const content = decodeURIComponent(escape(atob(data.content)));
     DB = JSON.parse(content);
     if (!Array.isArray(DB)) DB = [];
     try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
