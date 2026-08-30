@@ -50,6 +50,13 @@
         "reason": "测试",
         "quantity": 20,
         "remark": ""
+      },
+      {
+        "date": "2026-08-30",
+        "receiver": "散文",
+        "reason": "老快了",
+        "quantity": 20,
+        "remark": ""
       }
     ],
     "createdAt": "2026-08-30T11:07:24.783Z"
