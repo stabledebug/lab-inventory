@@ -1,1 +1,24 @@
-[]
+[
+  {
+    "id": "1788085005442",
+    "name": "移动喷头",
+    "spec": "2",
+    "quantity": "80",
+    "unit": "件",
+    "amount": "80",
+    "currency": "CNY",
+    "inDate": "2026-08-30",
+    "purchaser": "王瑞",
+    "reason": "实验室入库",
+    "seller": "科技大学",
+    "remark": "",
+    "outDate": "",
+    "outReceiver": "",
+    "outReason": "",
+    "outQuantity": "",
+    "outPrice": "",
+    "outCurrency": "CNY",
+    "outRemark": "",
+    "createdAt": "2026-08-30T10:16:45.443Z"
+  }
+]
