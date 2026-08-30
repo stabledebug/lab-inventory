@@ -296,10 +296,13 @@
       </div>
       <div class="section">
         <div class="section-title">数据导入导出</div>
-        <div class="export-tip">导出 CSV 可在 Excel / WPS 打开编辑；导入同样格式的 CSV 可批量恢复或合并数据。</div>
+        <div class="export-tip">导出 CSV 可在 Excel / WPS 打开编辑；导入同样格式的 CSV 可批量恢复或合并数据。数据已保存在 GitHub 仓库云端，课题组共享同一份。</div>
         <div style="display:flex; gap:12px; padding:0 16px 16px;">
           <button class="export-btn" id="exportBtn" style="margin:0;flex:1">导出表格</button>
           <button class="export-btn" id="importBtn" style="margin:0;flex:1;background:#fff;color:var(--blue);border:1px solid var(--blue)">导入表格</button>
+        </div>
+        <div style="padding:0 16px 16px;">
+          <button class="export-btn" id="tokenBtn" style="margin:0;width:100%;background:#fff;color:var(--muted);border:1px solid #ddd">更改访问令牌</button>
         </div>
         <input type="file" id="importFile" accept=".csv" style="display:none">
       </div>
@@ -318,15 +321,90 @@
 </div>
 
 <script>
-const STORE_KEY = 'lab_inventory_web';
-const UNITS = ['件','盒','瓶','支','个','包','箱','卷','袋','张','米','kg','g','L','mL'];
+/* ===== GitHub 云端同步（方案 B）=====
+   数据存在仓库的 inventory.json，所有人共享同一份。
+   令牌首次打开时粘贴，仅存本机浏览器（localStorage），不写入仓库源码，
+   以免触发 GitHub 密钥扫描拦截推送 / 自动撤销令牌。 */
+const REPO = 'stabledebug/lab-inventory';
+const FILE = 'inventory.json';
 
-function load() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }
-  catch(e) { return []; }
+let DB = [];
+
+function getToken() { return localStorage.getItem('lab_gh_token') || ''; }
+function ensureToken() {
+  const t = getToken();
+  if (t) return Promise.resolve(t);
+  return new Promise(resolve => {
+    const sheet = document.getElementById('sheet');
+    sheet.innerHTML = `<div class="sheet-head"><span class="sheet-title">设置访问令牌</span><span class="sheet-close" onclick="closeSheet()">×</span></div>
+      <div class="sheet-body" style="padding:16px">
+        <p style="font-size:13px;color:#666;line-height:1.6;margin-bottom:12px">数据保存在 GitHub 仓库，需粘贴一个 <b>Fine-grained PAT</b>（仅授权 lab-inventory 仓库 Contents 读写）才能读写。令牌只存在本机浏览器，不会上传。</p>
+        <input class="field-input" id="tokInput" placeholder="粘贴 github_pat_... 令牌" style="margin-bottom:16px">
+        <button class="btn primary" id="tokSave">保存并使用</button>
+      </div>`;
+    document.getElementById('mask').classList.add('show');
+    document.getElementById('tokSave').onclick = () => {
+      const v = document.getElementById('tokInput').value.trim();
+      if (!v) { toast('请输入令牌'); return; }
+      localStorage.setItem('lab_gh_token', v);
+      document.getElementById('mask').classList.remove('show');
+      resolve(v);
+    };
+  });
 }
-function save(list) { localStorage.setItem(STORE_KEY, JSON.stringify(list)); }
 
+async function apiGet() {
+  const tk = await ensureToken();
+  const r = await fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+    headers: { Authorization: `Bearer ${tk}`, Accept: 'application/vnd.github+json' }
+  });
+  if (r.status === 404) return { sha: null, data: [] };
+  if (!r.ok) throw new Error('读取失败 ' + r.status);
+  const j = await r.json();
+  const txt = decodeURIComponent(escape(atob(j.content.replace(/\s/g, ''))));
+  return { sha: j.sha, data: JSON.parse(txt) };
+}
+async function apiPut(data, sha) {
+  const tk = await ensureToken();
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+  const body = { message: 'update inventory ' + new Date().toISOString(), content };
+  if (sha) body.sha = sha;
+  return fetch(`https://api.github.com/repos/${REPO}/contents/${FILE}`, {
+    method: 'PUT',
+    headers: { Authorization: `Bearer ${tk}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+}
+function mergeArrays(remote, local) {
+  const m = new Map();
+  (remote || []).forEach(r => m.set(r.id, r));
+  (local || []).forEach(r => m.set(r.id, r));
+  return Array.from(m.values());
+}
+async function ensureFresh() {
+  try {
+    const { data } = await apiGet();
+    DB = Array.isArray(data) ? data : [];
+    try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
+  } catch (e) { /* 保留内存中的数据 */ }
+}
+async function push() {
+  for (let i = 0; i < 6; i++) {
+    const { sha, data: remote } = await apiGet();
+    const merged = mergeArrays(remote, DB);
+    const res = await apiPut(merged, sha);
+    if (res.ok) {
+      DB = merged;
+      try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
+      return;
+    }
+    if (res.status === 409) continue; // 别人刚改了，拉最新重试
+    throw new Error('保存失败(' + res.status + ')');
+  }
+  throw new Error('并发冲突，请稍后重试');
+}
+
+const UNITS = ['件','盒','瓶','支','个','包','箱','卷','袋','张','米','kg','g','L','mL'];
 function today() {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -342,12 +420,12 @@ function esc(s) {
 
 let state = { search: '', filter: 'all' };
 
-function showView(name) {
+async function showView(name) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById('view-' + name).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.view === name));
-  if (name === 'records') renderRecords();
-  if (name === 'stats') renderStats();
+  if (name === 'records') { await ensureFresh(); renderRecords(); }
+  if (name === 'stats') { await ensureFresh(); renderStats(); }
 }
 document.querySelectorAll('.nav-item').forEach(n => n.addEventListener('click', () => showView(n.dataset.view)));
 document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () => {
@@ -359,7 +437,7 @@ document.querySelectorAll('.tab').forEach(t => t.addEventListener('click', () =>
 document.getElementById('searchInput').addEventListener('input', e => { state.search = e.target.value.trim().toLowerCase(); renderRecords(); });
 
 function getFiltered() {
-  let list = load();
+  let list = DB;
   if (state.search) {
     list = list.filter(r =>
       (r.name||'').toLowerCase().includes(state.search) ||
@@ -368,7 +446,7 @@ function getFiltered() {
   }
   if (state.filter === 'in_stock') list = list.filter(r => !r.outDate);
   else if (state.filter === 'out_stock') list = list.filter(r => !!r.outDate);
-  list.sort((a,b) => new Date(b.inDate) - new Date(a.inDate));
+  list = list.slice().sort((a,b) => new Date(b.inDate) - new Date(a.inDate));
   return list;
 }
 function renderRecords() {
@@ -394,7 +472,7 @@ function renderRecords() {
 }
 
 function openDetail(id) {
-  const r = load().find(x => x.id === id);
+  const r = DB.find(x => x.id === id);
   if (!r) return;
   const sheet = document.getElementById('sheet');
   sheet.innerHTML = `
@@ -455,10 +533,7 @@ function openDetail(id) {
 function closeSheet() { document.getElementById('mask').classList.remove('show'); }
 document.getElementById('mask').addEventListener('click', e => { if (e.target.id === 'mask') closeSheet(); });
 
-function confirmOut(id) {
-  const list = load();
-  const r = list.find(x => x.id === id);
-  if (!r) return;
+async function confirmOut(id) {
   const outDate = document.getElementById('o-date').value;
   const outReceiver = document.getElementById('o-receiver').value.trim();
   const outReason = document.getElementById('o-reason').value.trim();
@@ -467,6 +542,9 @@ function confirmOut(id) {
   if (!outReceiver) { toast('请填写领用人'); return; }
   if (!outReason) { toast('请填写领用原因'); return; }
   if (!outQuantity) { toast('请填写领用数量'); return; }
+  await ensureFresh();
+  const r = DB.find(x => x.id === id);
+  if (!r) return;
   r.outDate = outDate;
   r.outReceiver = outReceiver;
   r.outReason = outReason;
@@ -474,22 +552,20 @@ function confirmOut(id) {
   r.outPrice = document.getElementById('o-price').value;
   r.outCurrency = document.getElementById('o-currency').value;
   r.outRemark = document.getElementById('o-remark').value.trim();
-  save(list);
-  closeSheet();
-  renderRecords();
-  toast('出库成功');
+  try { await push(); closeSheet(); renderRecords(); toast('出库成功'); }
+  catch (e) { toast(e.message); }
 }
 
-function delRecord(id) {
+async function delRecord(id) {
   if (!confirm('确定删除这条记录吗？')) return;
-  save(load().filter(x => x.id !== id));
-  closeSheet();
-  renderRecords();
-  toast('已删除');
+  await ensureFresh();
+  DB = DB.filter(x => x.id !== id);
+  try { await push(); closeSheet(); renderRecords(); toast('已删除'); }
+  catch (e) { toast(e.message); }
 }
 
 function editRecord(id) {
-  const r = load().find(x => x.id === id);
+  const r = DB.find(x => x.id === id);
   if (!r) return;
   const sheet = document.getElementById('sheet');
   sheet.innerHTML = `
@@ -525,10 +601,7 @@ function editRecord(id) {
       <button class="btn primary" onclick="saveEdit('${r.id}')">保存</button>
     </div>`;
 }
-function saveEdit(id) {
-  const list = load();
-  const r = list.find(x => x.id === id);
-  if (!r) return;
+async function saveEdit(id) {
   const name = document.getElementById('e-name').value.trim();
   const spec = document.getElementById('e-spec').value.trim();
   const quantity = document.getElementById('e-quantity').value;
@@ -545,24 +618,18 @@ function saveEdit(id) {
   if (!purchaser) { toast('请填写采购人'); return; }
   if (!reason) { toast('请填写采购理由'); return; }
   if (!seller) { toast('请填写卖方公司名称'); return; }
-  r.name = name;
-  r.spec = spec;
-  r.quantity = quantity;
-  r.unit = document.getElementById('e-unit').value;
-  r.amount = amount;
-  r.currency = document.getElementById('e-currency').value;
-  r.inDate = inDate;
-  r.purchaser = purchaser;
-  r.reason = reason;
-  r.seller = seller;
+  await ensureFresh();
+  const r = DB.find(x => x.id === id);
+  if (!r) return;
+  r.name = name; r.spec = spec; r.quantity = quantity; r.unit = document.getElementById('e-unit').value;
+  r.amount = amount; r.currency = document.getElementById('e-currency').value; r.inDate = inDate;
+  r.purchaser = purchaser; r.reason = reason; r.seller = seller;
   r.remark = document.getElementById('e-remark').value.trim();
-  save(list);
-  openDetail(id);
-  renderRecords();
-  toast('已保存');
+  try { await push(); openDetail(id); renderRecords(); toast('已保存'); }
+  catch (e) { toast(e.message); }
 }
 
-document.getElementById('addForm').addEventListener('submit', e => {
+document.getElementById('addForm').addEventListener('submit', async e => {
   e.preventDefault();
   const name = document.getElementById('f-name').value.trim();
   const spec = document.getElementById('f-spec').value.trim();
@@ -580,6 +647,7 @@ document.getElementById('addForm').addEventListener('submit', e => {
   if (!purchaser) { toast('请填写采购人'); return; }
   if (!reason) { toast('请填写采购理由'); return; }
   if (!seller) { toast('请填写卖方公司名称'); return; }
+  await ensureFresh();
   const rec = {
     id: Date.now().toString(),
     name, spec,
@@ -590,19 +658,20 @@ document.getElementById('addForm').addEventListener('submit', e => {
     outDate: '', outReceiver: '', outReason: '', outQuantity: '', outPrice: '', outCurrency: 'CNY', outRemark: '',
     createdAt: new Date().toISOString(),
   };
-  const list = load();
-  list.unshift(rec);
-  save(list);
-  e.target.reset();
-  document.getElementById('f-inDate').value = today();
-  document.getElementById('f-unit').value = '件';
-  document.getElementById('f-currency').value = 'CNY';
-  showView('records');
-  toast('入库成功');
+  DB.unshift(rec);
+  try {
+    await push();
+    e.target.reset();
+    document.getElementById('f-inDate').value = today();
+    document.getElementById('f-unit').value = '件';
+    document.getElementById('f-currency').value = 'CNY';
+    showView('records');
+    toast('入库成功');
+  } catch (err) { toast(err.message); }
 });
 
 function renderStats() {
-  const list = load();
+  const list = DB;
   const now = new Date();
   const y = now.getFullYear(), m = now.getMonth() + 1;
   const thisMonth = `${y}-${String(m).padStart(2,'0')}`;
@@ -648,7 +717,7 @@ function renderStats() {
       <span class="trend-label">${t.label}</span>
     </div>`).join('');
 
-  const recent = [...list].sort((a,b) => new Date(b.inDate) - new Date(a.inDate)).slice(0, 5);
+  const recent = list.slice().sort((a,b) => new Date(b.inDate) - new Date(a.inDate)).slice(0, 5);
   document.getElementById('recentList').innerHTML = recent.length
     ? recent.map(r => `
       <div class="recent-item" onclick="openDetail('${r.id}')">
@@ -659,10 +728,9 @@ function renderStats() {
 }
 
 document.getElementById('exportBtn').addEventListener('click', () => {
-  const list = load();
-  if (!list.length) { toast('暂无数据可导出'); return; }
+  if (!DB.length) { toast('暂无数据可导出'); return; }
   const header = ['货物名称','规格','数量','单位','入库日期','采购人','采购理由','金额','币种','卖方公司','入库备注','出库日期','领用人','领用原因','领用数量','出库金额','出库币种','出库备注','状态'];
-  const rows = list.map(r => [
+  const rows = DB.map(r => [
     r.name, r.spec||'', r.quantity||'', r.unit||'', r.inDate, r.purchaser||'', r.reason||'',
     r.amount||'', r.currency==='USD'?'美元':'人民币', r.seller||'', r.remark||'',
     r.outDate||'', r.outReceiver||'', r.outReason||'', r.outQuantity||'',
@@ -682,28 +750,32 @@ document.getElementById('exportBtn').addEventListener('click', () => {
   toast('已导出 CSV 文件');
 });
 
-// ---------- 导入 CSV ----------
 document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
-document.getElementById('importFile').addEventListener('change', e => {
+document.getElementById('tokenBtn').addEventListener('click', () => {
+  localStorage.removeItem('lab_gh_token');
+  ensureToken().then(() => { toast('令牌已更新'); showView('records'); });
+});
+document.getElementById('importFile').addEventListener('change', async e => {
   const file = e.target.files && e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = () => {
+  reader.onload = async () => {
     try {
       const text = String(reader.result).replace(/^\uFEFF/, '');
       const rows = parseCSV(text);
       if (rows.length < 2) { toast('文件无数据'); e.target.value = ''; return; }
       const dataRows = rows.slice(1).map(mapCsvRow).filter(r => r.name);
       if (!dataRows.length) { toast('未解析到有效记录'); e.target.value = ''; return; }
-      const existing = load();
+      await ensureFresh();
       let target;
-      if (existing.length) {
-        const overwrite = confirm('现有数据 ' + existing.length + ' 条：\n确定 = 覆盖\n取消 = 追加');
-        target = overwrite ? dataRows : existing.concat(dataRows);
+      if (DB.length) {
+        const overwrite = confirm('现有数据 ' + DB.length + ' 条：\n确定 = 覆盖\n取消 = 追加');
+        target = overwrite ? dataRows : DB.concat(dataRows);
       } else {
         target = dataRows;
       }
-      save(target);
+      DB = target;
+      await push();
       toast('已导入 ' + dataRows.length + ' 条');
       showView('records');
     } catch (err) {
@@ -769,7 +841,17 @@ function toast(msg) {
 }
 
 document.getElementById('f-inDate').value = today();
-renderRecords();
+(async function init() {
+  try {
+    const { data } = await apiGet();
+    DB = Array.isArray(data) ? data : [];
+    try { localStorage.setItem('lab_cache', JSON.stringify(DB)); } catch (e) {}
+  } catch (e) {
+    try { DB = JSON.parse(localStorage.getItem('lab_cache') || '[]'); } catch (e) { DB = []; }
+    toast('云端加载失败，显示本地缓存');
+  }
+  renderRecords();
+})();
 </script>
 </body>
 </html>
