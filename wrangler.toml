@@ -1,6 +1,6 @@
 name = "lab-inventory"
 main = "worker.js"
-compatibility_date = "2024-11-01"
+compatibility_date = "2024-01-01"
 
 [assets]
 directory = "."
