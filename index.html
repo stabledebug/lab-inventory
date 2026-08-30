@@ -243,7 +243,7 @@
       <div class="section">
         <div class="section-title">数据操作</div>
         <div style="padding:16px">
-          <button class="btn primary" style="width:100%;margin-bottom:12px" id="exportBtn">导出表格到剪贴板</button>
+          <button class="btn primary" style="width:100%;margin-bottom:12px" id="exportBtn">导出 CSV 文件</button>
           <button class="btn plain" style="width:100%;margin-bottom:12px" id="importBtn">导入 CSV 文件</button>
           <input type="file" id="importFile" accept=".csv,.txt" style="display:none">
           <button class="btn plain" style="width:100%" id="tokenBtn">更换 Token</button>
@@ -602,7 +602,14 @@ document.getElementById('exportBtn').addEventListener('click', () => {
     const s = String(c);
     return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
   }).join(',')).join('\n');
-  navigator.clipboard.writeText('\ufeff' + csv).then(() => toast('CSV 已复制到剪贴板')).catch(() => toast('复制失败'));
+  // 下载 CSV 文件
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `耗材管理_${today()}.csv`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+  toast('CSV 文件已下载');
 });
 
 document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
