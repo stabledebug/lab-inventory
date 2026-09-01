@@ -1,43 +1,5 @@
 [
   {
-    "id": "1788088044783",
-    "name": "黄金",
-    "spec": "1g",
-    "quantity": "100",
-    "unit": "件",
-    "amount": "10000",
-    "currency": "CNY",
-    "inDate": "2026-08-30",
-    "purchaser": "马怀冲",
-    "reason": "实验室测试",
-    "seller": "中国黄金",
-    "remark": "",
-    "outHistory": [
-      {
-        "date": "2026-08-30",
-        "receiver": "马怀冲",
-        "reason": "实验室耗材",
-        "quantity": 20,
-        "remark": ""
-      },
-      {
-        "date": "2026-08-30",
-        "receiver": "小仙女",
-        "reason": "测试",
-        "quantity": 20,
-        "remark": ""
-      },
-      {
-        "date": "2026-08-30",
-        "receiver": "散文",
-        "reason": "老快了",
-        "quantity": 20,
-        "remark": ""
-      }
-    ],
-    "createdAt": "2026-08-30T11:07:24.783Z"
-  },
-  {
     "id": "1788087259876",
     "name": "枪头",
     "spec": "10ml",
