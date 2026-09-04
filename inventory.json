@@ -1,5 +1,21 @@
 [
   {
+    "id": "1788482586820",
+    "name": "TiO2",
+    "spec": "5*5*0.50 <110>/<001>-2s p",
+    "quantity": "10",
+    "unit": "件",
+    "amount": "2000",
+    "currency": "CNY",
+    "inDate": "2026-09-04",
+    "purchaser": "张东辉",
+    "reason": "实验用",
+    "seller": "合肥科晶材料技术有限公司",
+    "remark": "",
+    "outHistory": [],
+    "createdAt": "2026-09-04T00:43:06.821Z"
+  },
+  {
     "id": "1788482514454",
     "name": "PMNT",
     "spec": "5*5*0.50 <110>/<100>-1s p",
