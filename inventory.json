@@ -203,6 +203,13 @@
         "reason": "戴健坤实验用",
         "quantity": 30,
         "remark": ""
+      },
+      {
+        "date": "2026-09-04",
+        "receiver": "戴健坤",
+        "reason": "戴健坤实验用",
+        "quantity": 30,
+        "remark": ""
       }
     ],
     "createdAt": "2026-09-04T00:37:31.122Z"
