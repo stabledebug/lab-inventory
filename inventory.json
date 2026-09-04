@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "id": "1788481960149",
+    "name": "氧化铝",
+    "spec": "5*5*0.50 <1-102>/<11-20 >-1sp",
+    "quantity": "20",
+    "unit": "件",
+    "amount": "360",
+    "currency": "CNY",
+    "inDate": "2026-09-04",
+    "purchaser": "张东辉",
+    "reason": "曹彦彰用",
+    "seller": "合肥科晶材料技术有限公司",
+    "remark": "",
+    "outHistory": [],
+    "createdAt": "2026-09-04T00:32:40.149Z"
+  }
+]
