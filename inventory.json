@@ -196,7 +196,15 @@
     "reason": "曹彦彰用",
     "seller": "合肥科晶材料技术有限公司",
     "remark": "",
-    "outHistory": [],
+    "outHistory": [
+      {
+        "date": "2026-09-04",
+        "receiver": "曹彦彰",
+        "reason": "曹彦彰实验用",
+        "quantity": 20,
+        "remark": ""
+      }
+    ],
     "createdAt": "2026-09-04T00:32:40.149Z"
   }
 ]
