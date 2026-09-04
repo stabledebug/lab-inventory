@@ -188,7 +188,15 @@
     "reason": "多人实验用",
     "seller": "合肥科晶材料技术有限公司",
     "remark": "",
-    "outHistory": [],
+    "outHistory": [
+      {
+        "date": "2026-09-04",
+        "receiver": "戴健坤",
+        "reason": "戴健坤实验用",
+        "quantity": 30,
+        "remark": ""
+      }
+    ],
     "createdAt": "2026-09-04T00:37:31.122Z"
   },
   {
