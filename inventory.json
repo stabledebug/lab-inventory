@@ -1,5 +1,21 @@
 [
   {
+    "id": "1788482623211",
+    "name": "TiO2",
+    "spec": "5*3*0.50 <110>/<001>-1s p",
+    "quantity": "5",
+    "unit": "件",
+    "amount": "500",
+    "currency": "CNY",
+    "inDate": "2026-09-04",
+    "purchaser": "张东辉",
+    "reason": "实验用",
+    "seller": "合肥科晶材料技术有限公司",
+    "remark": "",
+    "outHistory": [],
+    "createdAt": "2026-09-04T00:43:43.211Z"
+  },
+  {
     "id": "1788482586820",
     "name": "TiO2",
     "spec": "5*5*0.50 <110>/<001>-2s p",
