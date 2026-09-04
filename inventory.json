@@ -52,7 +52,15 @@
     "reason": "实验用",
     "seller": "合肥科晶材料技术有限公司",
     "remark": "",
-    "outHistory": [],
+    "outHistory": [
+      {
+        "date": "2026-09-04",
+        "receiver": "周致远",
+        "reason": "周致远实验用",
+        "quantity": 5,
+        "remark": ""
+      }
+    ],
     "createdAt": "2026-09-04T00:44:31.785Z"
   },
   {
